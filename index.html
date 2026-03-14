@@ -733,9 +733,6 @@ const SERVICES = {
     fields: [
       { header: 'Timestamp', type: '!', short: null },
       { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number' },
-      { header: 'Name',      type: '#', short: 'n',   label: 'Name / Label',ph: 'Network name',input: 'text'  },
-      { header: 'SSID',      type: '#', short: 's',   label: 'SSID',        ph: 'WiFi Name',   input: 'text'   },
-      { header: 'Password',  type: '#', short: 'p',   label: 'Password',    ph: 'WiFi Password',input:'text'  },
     ]
   },
   P11_Challan: {
@@ -845,6 +842,26 @@ function generateForm(key, svc) {
     }
   }
 
+  // Special extra upload field for WiFi service
+  if (key === 'P09_WiFi') {
+    fieldsHTML += `
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label" for="wifiQrFile">
+            <span class="field-symbol sym-hash">#</span>
+            WiFi QR Image Upload
+          </label>
+          <input
+            class="field-input"
+            id="wifiQrFile"
+            type="file"
+            accept="image/*"
+          />
+        </div>
+      </div>
+    `;
+  }
+
   document.getElementById('formContainer').innerHTML = `
     <div class="form-card">
       <div class="form-card-header">
@@ -927,6 +944,19 @@ async function handleSubmit() {
     }
   }
 
+  // For WiFi, ensure a QR image is uploaded
+  let wifiFile = null;
+  if (currentService === 'P09_WiFi') {
+    const fileInput = document.getElementById('wifiQrFile');
+    wifiFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    if (!wifiFile) {
+      if (fileInput) fileInput.style.borderColor = '#e74c3c';
+      showToast('Please upload the WiFi QR image.', 'error');
+      return;
+    }
+    if (fileInput) fileInput.style.borderColor = '';
+  }
+
   if (!valid) { showToast('Please fill all required fields.', 'error'); return; }
 
   // Auto timestamp
@@ -941,20 +971,29 @@ async function handleSubmit() {
   const rowData = {};
   svc.fields.forEach(f => {
     const col = f.sheetHeader || f.header;
-    if (f.type === '!') rowData[col] = ts;
-    else rowData[col] = values[f.header] || '';
+    if (f.type === '!') {
+      rowData[col] = ts;
+    } else if (f.type === '$') {
+      rowData[col] = values[f.header] || '';
+    } else if (f.type === '#') {
+      // For WiFi service, do not store # fields in sheet
+      if (currentService !== 'P09_WiFi') {
+        rowData[col] = values[f.header] || '';
+      }
+    }
   });
+
+  const custId   = values['Cust_ID'];
+  let qrURL = null;
 
   // Build short-key secret for QR (only # fields, excluding Cust_ID which is $)
   const secret = {};
   svc.fields.filter(f => f.type === '#').forEach(f => {
     secret[f.short] = values[f.header];
   });
-
   const sEncoded = btoa(JSON.stringify(secret));
-  const custId   = values['Cust_ID'];
   // Keep QR payload compact: only send service type + encoded secret
-  const qrURL    = `${SCANNER_URL}?t=${currentService}&s=${sEncoded}`;
+  qrURL = `${SCANNER_URL}?t=${currentService}&s=${sEncoded}`;
 
   // POST to SheetDB
   try {
@@ -970,7 +1009,11 @@ async function handleSubmit() {
     }
 
     showToast('Saved to ' + svc.tab + ' successfully!', 'success');
-    renderQR(qrURL, custId, currentService);
+    if (currentService === 'P09_WiFi') {
+      renderWifiQR(wifiFile, custId, currentService, qrURL);
+    } else {
+      renderQR(qrURL, custId, currentService);
+    }
 
   } catch (err) {
     showToast('Sheet save failed: ' + err.message, 'error');
@@ -997,11 +1040,11 @@ function renderQR(url, custId, serviceKey) {
   // Generate
   new QRCode(qrDiv, {
     text:         url,
-    width:        192,
-    height:       192,
+    width:        256,
+    height:       256,
     colorDark:    '#0a0a0f',
     colorLight:   '#ffffff',
-    correctLevel: QRCode.CorrectLevel.M
+    correctLevel: QRCode.CorrectLevel.L
   });
 
   qrPlaceholder.style.display = 'none';
@@ -1017,6 +1060,49 @@ function renderQR(url, custId, serviceKey) {
   urlPreview.style.display = 'flex';
 
   btnDl.style.display = 'block';
+}
+
+// For WiFi service: show uploaded QR image instead of generating a new one,
+// but still display the internal QR link for reference.
+function renderWifiQR(file, custId, serviceKey, url) {
+  const qrBox = document.getElementById('qrBox');
+  const qrDiv = document.getElementById('qrCode');
+  const qrPlaceholder = document.getElementById('qrPlaceholder');
+  const idDisplay = document.getElementById('qrIdDisplay');
+  const urlPreview = document.getElementById('urlPreview');
+  const btnDl = document.getElementById('btnDownload');
+
+  qrDiv.innerHTML = '';
+
+  if (!file) {
+    showToast('WiFi QR image not available.', 'error');
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.style.maxWidth = '192px';
+  img.style.maxHeight = '192px';
+  qrDiv.appendChild(img);
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  qrPlaceholder.style.display = 'none';
+  qrBox.style.display = 'flex';
+
+  document.getElementById('qrIdValue').textContent = custId;
+  document.getElementById('qrServiceTag').textContent = serviceKey + ' | ' + SERVICES[serviceKey].label;
+  idDisplay.style.display = 'flex';
+
+  // Show the internal QR link (full)
+  document.getElementById('urlPreviewVal').textContent = url || 'Existing WiFi QR image';
+  urlPreview.style.display = 'flex';
+
+  // Disable download button for this mode
+  btnDl.style.display = 'none';
 }
 
 function downloadQR() {

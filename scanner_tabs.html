@@ -782,7 +782,7 @@ function routePay(s, n) {
   const upiLink = 'upi://pay?pa=' + encodeURIComponent(upiId) + '&pn=' + encodeURIComponent(name) + '&cu=INR';
   document.getElementById('p01_manualBtn').href = upiLink;
   // Auto-redirect after short delay
-  setTimeout(() => { window.location.href = upiLink; }, 800);
+  setTimeout(() => { window.location.href = upiLink; }, 150);
 }
 
 // ============================================================
