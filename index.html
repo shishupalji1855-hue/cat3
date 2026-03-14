@@ -692,7 +692,7 @@ const SERVICES = {
       { header: 'Timestamp',  type: '!', short: null },
       { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',     input: 'text'   },
-      { header: 'UPI_ID',     type: '#', short: 'u',   label: 'UPI ID',       ph: 'name@upi',      input: 'text'   },
+      { header: 'QR_Link_ID', type: '#', short: 'u',   label: 'QR Link ID',   ph: 'https://...',   input: 'text'   },
     ]
   },
   P03_Biz: {
@@ -733,18 +733,8 @@ const SERVICES = {
     fields: [
       { header: 'Timestamp', type: '!', short: null },
       { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number' },
-    ]
-  },
-  P11_Challan: {
-    label: 'Vehicle Challan',
-    tab:   'P11_Challan',
-    fields: [
-      { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1011', input: 'number' },
-      { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Owner name', input: 'text'   },
-      { header: 'Vehicle_No', type: '#', short: 'v',   label: 'Vehicle No.',  ph: 'MH12AB1234', input: 'text'   },
-      { header: 'Engine_No',  type: '#', short: 'e',   label: 'Engine No.',   ph: 'Engine number',input:'text' },
-      { header: 'Chassis_No', type: '#', short: 'c',   label: 'Chassis No.',  ph: 'Chassis number',input:'text'},
+      { header: 'SSID',      type: '#', short: 's',   label: 'WiFi Name (SSID)', ph: 'Network name', input: 'text' },
+      { header: 'Password',  type: '#', short: 'p',   label: 'Password', ph: 'WiFi password', input: 'text' },
     ]
   },
   P12_Invite: {
@@ -763,7 +753,7 @@ const SERVICES = {
   },
   P15_Static: {
     label: 'Static Location',
-    tab:   'P15-Static',
+    tab:   'P15_Static',
     fields: [
       { header: 'Timestamp',        type: '!', short: null },
       { header: 'Cust_ID',          type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1015',          input: 'number', sheetHeader: 'Cust_ID(No.)' },
@@ -840,26 +830,6 @@ function generateForm(key, svc) {
     } else {
       fieldsHTML += `<div class="field-row full">${fieldHTML(f1)}</div>`;
     }
-  }
-
-  // Special extra upload field for WiFi service
-  if (key === 'P09_WiFi') {
-    fieldsHTML += `
-      <div class="field-row full">
-        <div class="field-group">
-          <label class="field-label" for="wifiQrFile">
-            <span class="field-symbol sym-hash">#</span>
-            WiFi QR Image Upload
-          </label>
-          <input
-            class="field-input"
-            id="wifiQrFile"
-            type="file"
-            accept="image/*"
-          />
-        </div>
-      </div>
-    `;
   }
 
   document.getElementById('formContainer').innerHTML = `
@@ -944,19 +914,6 @@ async function handleSubmit() {
     }
   }
 
-  // For WiFi, ensure a QR image is uploaded
-  let wifiFile = null;
-  if (currentService === 'P09_WiFi') {
-    const fileInput = document.getElementById('wifiQrFile');
-    wifiFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
-    if (!wifiFile) {
-      if (fileInput) fileInput.style.borderColor = '#e74c3c';
-      showToast('Please upload the WiFi QR image.', 'error');
-      return;
-    }
-    if (fileInput) fileInput.style.borderColor = '';
-  }
-
   if (!valid) { showToast('Please fill all required fields.', 'error'); return; }
 
   // Auto timestamp
@@ -995,6 +952,11 @@ async function handleSubmit() {
   // Keep QR payload compact: only send service type + encoded secret
   qrURL = `${SCANNER_URL}?t=${currentService}&s=${sEncoded}`;
 
+  // Special case: P01_Pay uses exact link for QR
+  if (currentService === 'P01_Pay') {
+    qrURL = values['QR_Link_ID'] || qrURL;
+  }
+
   // POST to SheetDB
   try {
     const res = await fetch(`${SHEETDB_BASE}?sheet=${svc.tab}`, {
@@ -1009,11 +971,7 @@ async function handleSubmit() {
     }
 
     showToast('Saved to ' + svc.tab + ' successfully!', 'success');
-    if (currentService === 'P09_WiFi') {
-      renderWifiQR(wifiFile, custId, currentService, qrURL);
-    } else {
-      renderQR(qrURL, custId, currentService);
-    }
+    renderQR(qrURL, custId, currentService);
 
   } catch (err) {
     showToast('Sheet save failed: ' + err.message, 'error');
@@ -1060,49 +1018,6 @@ function renderQR(url, custId, serviceKey) {
   urlPreview.style.display = 'flex';
 
   btnDl.style.display = 'block';
-}
-
-// For WiFi service: show uploaded QR image instead of generating a new one,
-// but still display the internal QR link for reference.
-function renderWifiQR(file, custId, serviceKey, url) {
-  const qrBox = document.getElementById('qrBox');
-  const qrDiv = document.getElementById('qrCode');
-  const qrPlaceholder = document.getElementById('qrPlaceholder');
-  const idDisplay = document.getElementById('qrIdDisplay');
-  const urlPreview = document.getElementById('urlPreview');
-  const btnDl = document.getElementById('btnDownload');
-
-  qrDiv.innerHTML = '';
-
-  if (!file) {
-    showToast('WiFi QR image not available.', 'error');
-    return;
-  }
-
-  const img = document.createElement('img');
-  img.style.maxWidth = '192px';
-  img.style.maxHeight = '192px';
-  qrDiv.appendChild(img);
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-
-  qrPlaceholder.style.display = 'none';
-  qrBox.style.display = 'flex';
-
-  document.getElementById('qrIdValue').textContent = custId;
-  document.getElementById('qrServiceTag').textContent = serviceKey + ' | ' + SERVICES[serviceKey].label;
-  idDisplay.style.display = 'flex';
-
-  // Show the internal QR link (full)
-  document.getElementById('urlPreviewVal').textContent = url || 'Existing WiFi QR image';
-  urlPreview.style.display = 'flex';
-
-  // Disable download button for this mode
-  btnDl.style.display = 'none';
 }
 
 function downloadQR() {

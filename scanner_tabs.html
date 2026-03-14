@@ -444,10 +444,10 @@
       <div class="card-body" style="padding:2.5rem 1.75rem;">
         <div class="loader-ring" style="margin:0 auto 1.25rem;"></div>
         <div class="heading-sm" id="p01_name">Loading...</div>
-        <div class="sub-text" style="margin-top:0.3rem;">Redirecting to UPI payment...</div>
+        <div class="sub-text" style="margin-top:0.3rem;">Redirecting to payment link...</div>
         <div class="divider"></div>
         <a class="btn-primary btn-green" id="p01_manualBtn" href="#" style="margin-top:0.5rem;">
-          Open UPI Manually
+          Open Link Manually
         </a>
       </div>
       <div class="card-footer">
@@ -554,39 +554,6 @@
     <div class="card-footer">
       <div class="footer-brand">10<span>haath</span></div>
       <div class="footer-type mono">P09_WIFI</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P11_CHALLAN ===== -->
-<div id="page_P11_Challan" class="page">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Vehicle Challan</div>
-    </div>
-    <div class="card-body">
-      <div class="heading-sm" id="p11_name">---</div>
-      <div class="sub-text">Vehicle Challan Details</div>
-      <div class="divider"></div>
-      <div>
-        <div class="challan-label">Vehicle Number</div>
-        <input class="challan-field" id="p11_vno" readonly placeholder="---"/>
-        <div class="challan-label">Engine Number</div>
-        <input class="challan-field" id="p11_eno" readonly placeholder="---"/>
-        <div class="challan-label">Chassis Number</div>
-        <input class="challan-field" id="p11_cno" readonly placeholder="---"/>
-      </div>
-      <div class="btn-group">
-        <a class="btn-primary" id="p11_challanLink" href="https://echallan.parivahan.gov.in" target="_blank" rel="noopener">
-          Open eChallan Portal
-        </a>
-        <button class="btn-secondary" onclick="copyAllChallan()">Copy All Details</button>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P11_CHALLAN</div>
     </div>
   </div>
 </div>
@@ -706,7 +673,6 @@
 // P04_Review:  n=Name, r=Review_URL
 // P08_Resume:  n=Name, d=Drive_URL
 // P09_WiFi:    n=Name, s=SSID, p=Password
-// P11_Challan: n=Name, v=Vehicle_No, e=Engine_No, c=Chassis_No
 // P12_Invite:  n=Name, k=PIN, ev=Event_Name, dt=Date, m=Maps_Link, vl=Video_Link
 // P15_Static:  k=PIN, loc=Name of location, wa=Written Address, m=Maps_Link, vl=Video_Link
 
@@ -754,7 +720,6 @@ function route() {
     'P04_Review':  () => routeReview(secret, n),
     'P08_Resume':  () => routeResume(secret, n),
     'P09_WiFi':    () => routeWifi(secret, n),
-    'P11_Challan': () => routeChallan(secret, n),
     'P12_Invite':  () => routeInvite(secret, n),
     'P15_Static':  () => routeStatic(secret, n),
   };
@@ -771,18 +736,18 @@ function route() {
 // ============================================================
 function routePay(s, n) {
   const name  = s.n || n || 'Payee';
-  const upiId = s.u || '';
+  const qrLink = s.u || '';
   showPage('page_P01_Pay');
   document.getElementById('p01_name').textContent = 'Pay: ' + name;
 
-  if (!upiId) {
-    document.getElementById('p01_manualBtn').textContent = 'UPI ID not found';
+  if (!qrLink) {
+    document.getElementById('p01_manualBtn').textContent = 'QR Link not found';
     return;
   }
-  const upiLink = 'upi://pay?pa=' + encodeURIComponent(upiId) + '&pn=' + encodeURIComponent(name) + '&cu=INR';
-  document.getElementById('p01_manualBtn').href = upiLink;
+  
+  document.getElementById('p01_manualBtn').href = qrLink;
   // Auto-redirect after short delay
-  setTimeout(() => { window.location.href = upiLink; }, 150);
+  setTimeout(() => { window.location.href = qrLink; }, 150);
 }
 
 // ============================================================
@@ -911,37 +876,6 @@ function copyPassword() {
 function copyWifiDetails(ssid, pass) {
   navigator.clipboard.writeText('WiFi: ' + ssid + '\nPassword: ' + pass).then(() => {
     alert('WiFi details copied to clipboard!\nSSID: ' + ssid + '\nPassword: ' + pass);
-  });
-}
-
-// ============================================================
-// P11_CHALLAN — eChallan
-// ============================================================
-function routeChallan(s, n) {
-  const name  = s.n || n || 'Owner';
-  const vno   = s.v || '';
-  const eno   = s.e || '';
-  const cno   = s.c || '';
-
-  document.getElementById('p11_name').textContent = name;
-  document.getElementById('p11_vno').value  = vno;
-  document.getElementById('p11_eno').value  = eno;
-  document.getElementById('p11_cno').value  = cno;
-
-  // Try to build a pre-filled eChallan URL (best-effort; site may not support params)
-  const challanUrl = 'https://echallan.parivahan.gov.in/index/accused-challan?vehicleNumber=' + encodeURIComponent(vno);
-  document.getElementById('p11_challanLink').href = challanUrl;
-
-  showPage('page_P11_Challan');
-}
-
-function copyAllChallan() {
-  const vno = document.getElementById('p11_vno').value;
-  const eno = document.getElementById('p11_eno').value;
-  const cno = document.getElementById('p11_cno').value;
-  const txt = 'Vehicle No: ' + vno + '\nEngine No: ' + eno + '\nChassis No: ' + cno;
-  navigator.clipboard.writeText(txt).then(() => {
-    alert('All details copied to clipboard!');
   });
 }
 
