@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>10haath — Master Builder</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f5f3ee;
+    --accent: #e8490f;
+    --accent2: #1a6b3c;
+    --steel: #2d2d3a;
+    --mist: #e2dfd8;
+    --gold: #c9a84c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* Header */
+  .site-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--accent);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-mark {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--paper);
+  }
+  .logo-mark span { color: var(--accent); }
+  .header-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    background: var(--accent);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Layout */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr 320px;
+    gap: 0;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2rem 1.5rem;
+    border-right: 1px solid #222;
+  }
+  .sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Category Buttons */
+  .cat-btn {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid #333;
+    background: transparent;
+    color: #888;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-btn:hover { border-color: #555; color: #ccc; background: #111; }
+  .cat-btn.active {
+    border-color: var(--accent);
+    color: var(--paper);
+    background: #1a0a05;
+  }
+  .cat-btn.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+  }
+  .cat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    background: #333;
+    padding: 2px 6px;
+    border-radius: 2px;
+    min-width: 28px;
+    text-align: center;
+  }
+  .cat-btn.active .cat-num { background: var(--accent); color: white; }
+  .cat-btn.disabled { opacity: 0.35; cursor: not-allowed; }
+  .cat-btn.disabled:hover { border-color: #333; color: #888; background: transparent; }
+
+  /* Service Selector */
+  .service-grid {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 1.5rem;
+  }
+  .svc-btn {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid #2a2a2a;
+    background: #111;
+    color: #999;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 3px;
+    transition: all 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .svc-btn:hover { border-color: #444; color: #ccc; background: #161616; }
+  .svc-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: #1a1508;
+  }
+  .svc-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; }
+  .svc-btn.active .svc-dot { background: var(--gold); }
+
+  /* Main Content */
+  .content-area {
+    padding: 2.5rem 2.5rem 2rem;
+    background: var(--paper);
+    overflow-y: auto;
+  }
+
+  /* Section Header */
+  .section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--mist);
+  }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .section-title {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .section-desc {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.4rem;
+    font-weight: 400;
+  }
+
+  /* Form Card */
+  .form-card {
+    background: white;
+    border: 1px solid var(--mist);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .form-card-header {
+    background: var(--steel);
+    color: var(--paper);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .form-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .form-card-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    background: rgba(255,255,255,0.12);
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .form-body { padding: 1.5rem; }
+
+  /* Field Groups */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .field-row.full { grid-template-columns: 1fr; }
+  .field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .field-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .sym-hash { background: #e8f4ec; color: var(--accent2); }
+  .sym-dollar { background: #fff3e8; color: var(--accent); }
+  .sym-auto { background: #f0f0f5; color: #888; }
+  .field-input {
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--mist);
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+    background: var(--paper);
+    transition: all 0.15s;
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--ink); background: white; }
+  .field-input::placeholder { color: #bbb; font-size: 0.82rem; }
+  .field-input.id-field {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-color: #ffc89a;
+    background: #fffaf5;
+  }
+  .auto-field {
+    padding: 0.65rem 0.85rem;
+    border: 1.5px dashed var(--mist);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #aaa;
+    background: #fafafa;
+    cursor: not-allowed;
+  }
+
+  /* Submit */
+  .submit-bar {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--mist);
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .btn-submit {
+    padding: 0.8rem 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-submit:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-reset {
+    padding: 0.8rem 1.2rem;
+    background: transparent;
+    color: #888;
+    border: 1.5px solid var(--mist);
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: #999; color: var(--ink); }
+
+  /* Legend */
+  .legend-strip {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #888;
+  }
+
+  /* QR Panel */
+  .qr-panel {
+    background: var(--steel);
+    color: var(--paper);
+    padding: 2rem 1.5rem;
+    border-left: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .qr-panel-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #666;
+    align-self: flex-start;
+    width: 100%;
+  }
+  .qr-placeholder {
+    width: 200px;
+    height: 200px;
+    border: 2px dashed #3a3a4a;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #444;
+  }
+  .qr-placeholder-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.3;
+  }
+  .qr-placeholder-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-align: center;
+    color: #555;
+    line-height: 1.5;
+  }
+  .qr-box {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-id-display {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.85rem 1rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .qr-id-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #666;
+  }
+  .qr-id-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+  .qr-service-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: #888;
+  }
+  .btn-download {
+    width: 100%;
+    padding: 0.75rem;
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .btn-download:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    min-width: 280px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--accent2); color: white; }
+  .toast.error { background: #c0392b; color: white; }
+  .toast.info { background: var(--steel); color: var(--paper); }
+
+  /* Status dots */
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #333;
+    display: inline-block;
+  }
+  .status-dot.live { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: #bbb;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  .empty-state-title { font-size: 1.1rem; font-weight: 600; color: #999; }
+  .empty-state-desc { font-size: 0.82rem; line-height: 1.5; }
+
+  /* Spinner */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* URL preview */
+  .url-preview {
+    width: 100%;
+    background: #0d0d15;
+    border: 1px solid #222;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .url-preview-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: #555;
+    text-transform: uppercase;
+  }
+  .url-preview-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: #6b9afc;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 240px 1fr; }
+    .qr-panel { display: none; }
+  }
+  @media (max-width: 720px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo-mark">10<span>haath</span></div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:#666;">
+      <span class="status-dot live"></span>
+      <span class="mono" style="font-size:0.62rem;">SHEETDB LIVE</span>
+    </div>
+    <div class="header-badge">BUILDER v2</div>
+  </div>
+</header>
+
+<div class="main-grid">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">// Category</div>
+    <button class="cat-btn disabled" id="cat1" onclick="selectCategory(1)">
+      <span class="cat-num">C1</span> Standard Tags
+    </button>
+    <button class="cat-btn disabled" id="cat2" onclick="selectCategory(2)">
+      <span class="cat-num">C2</span> Smart NFC
+    </button>
+    <button class="cat-btn active" id="cat3" onclick="selectCategory(3)">
+      <span class="cat-num">C3</span> QR Services
+    </button>
+    <button class="cat-btn disabled" id="cat4" onclick="selectCategory(4)">
+      <span class="cat-num">C4</span> Hybrid Combo
+    </button>
+
+    <div id="serviceSection" style="margin-top:1.5rem;">
+      <div class="sidebar-title">// Service Type</div>
+      <div class="service-grid" id="serviceGrid"></div>
+    </div>
+
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #222;">
+      <div class="sidebar-title">// Legend</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div class="legend-item"><span class="field-symbol sym-hash">#</span> Encoded in QR</div>
+        <div class="legend-item"><span class="field-symbol sym-dollar">$</span> Sheet only</div>
+        <div class="legend-item"><span class="field-symbol sym-auto">!</span> Auto timestamp</div>
+        <div class="legend-item"><span style="font-size:0.65rem;background:#1a1a2e;color:#6b9afc;padding:1px 5px;border-radius:2px;font-family:JetBrains Mono,monospace;">%</span> Filled at scan</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content-area">
+    <div class="section-header">
+      <div class="section-tag">// Master Builder &mdash; Category 3</div>
+      <div class="section-title" id="mainTitle">QR Services</div>
+      <div class="section-desc" id="mainDesc">Select a service type from the sidebar to begin building.</div>
+    </div>
+
+    <div id="formContainer">
+      <div class="empty-state">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style="opacity:0.3;">
+          <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="32" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="4" y="32" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="38" y="38" width="8" height="8" fill="currentColor" opacity="0.5"/>
+          <rect x="32" y="32" width="8" height="8" fill="currentColor" opacity="0.3"/>
+        </svg>
+        <div class="empty-state-title">No service selected</div>
+        <div class="empty-state-desc">Choose a service type from the<br/>left sidebar to load its form.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- QR PANEL -->
+  <aside class="qr-panel">
+    <div class="qr-panel-title">// Generated QR</div>
+
+    <div id="qrPlaceholder" class="qr-placeholder">
+      <svg class="qr-placeholder-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="18" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+        <rect x="27" y="3" width="18" height="18" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+        <rect x="3" y="27" width="18" height="18" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+        <rect x="8" y="8" width="8" height="8" fill="currentColor"/>
+        <rect x="32" y="8" width="8" height="8" fill="currentColor"/>
+        <rect x="8" y="32" width="8" height="8" fill="currentColor"/>
+        <rect x="30" y="28" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="36" y="28" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="30" y="34" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="36" y="34" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="30" y="40" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="36" y="40" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="42" y="34" width="4" height="4" fill="currentColor" opacity="0.6"/>
+        <rect x="42" y="40" width="4" height="4" fill="currentColor" opacity="0.6"/>
+      </svg>
+      <div class="qr-placeholder-text">Fill the form and<br/>click Generate QR</div>
+    </div>
+
+    <div id="qrBox" class="qr-box" style="display:none;">
+      <div id="qrCode"></div>
+    </div>
+
+    <div id="qrIdDisplay" class="qr-id-display">
+      <div class="qr-id-label">Customer ID</div>
+      <div class="qr-id-value" id="qrIdValue">---</div>
+      <div class="qr-service-tag" id="qrServiceTag">---</div>
+    </div>
+
+    <div id="urlPreview" class="url-preview">
+      <div class="url-preview-label">Encoded URL</div>
+      <div class="url-preview-val" id="urlPreviewVal">---</div>
+    </div>
+
+    <button class="btn-download" id="btnDownload" onclick="downloadQR()">
+      Download QR PNG
+    </button>
+
+    <div style="width:100%;padding-top:1rem;border-top:1px solid #333;">
+      <div class="qr-panel-title">// Sheet Target</div>
+      <div id="sheetTarget" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#555;margin-top:0.5rem;">
+        No service selected
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG — Exact tab names & column headers per spec
+// ============================================================
+const SHEETDB_BASE = 'https://sheetdb.io/api/v1/vpozwh7cptzc4';
+// Always generate a full absolute URL for the scanner page
+const SCANNER_URL  = new URL('scanner_tabs.html', window.location.href).toString();
+
+// Each service: fields array ordered as per spec
+// type: '#' = QR+Sheet, '$' = Sheet only, '!' = auto
+const SERVICES = {
+  P01_Pay: {
+    label: 'UPI Payment',
+    tab:   'P01_Pay',
+    // key mapping: full header -> 1-letter short key (for QR compression)
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number' },
+      { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',     input: 'text'   },
+      { header: 'UPI_ID',     type: '#', short: 'u',   label: 'UPI ID',       ph: 'name@upi',      input: 'text'   },
+    ]
+  },
+  P03_Biz: {
+    label: 'Business Card',
+    tab:   'P03_Biz',
+    fields: [
+      { header: 'Timestamp',    type: '!', short: null },
+      { header: 'Cust_ID',      type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1002',   input: 'number' },
+      { header: 'Name',         type: '#', short: 'n',   label: 'Name',           ph: 'Full name',   input: 'text'   },
+      { header: 'Job',          type: '#', short: 'j',   label: 'Job / Title',    ph: 'Designation', input: 'text'   },
+      { header: 'Phone',        type: '#', short: 'p',   label: 'Phone',          ph: '+91XXXXXXXXXX',input:'text'  },
+      { header: 'Social_Links', type: '#', short: 's',   label: 'Social Links',   ph: 'https://...',  input: 'text'   },
+    ]
+  },
+  P04_Review: {
+    label: 'Google Review',
+    tab:   'P04_Review',
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1003', input: 'number' },
+      { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',  input: 'text'   },
+      { header: 'Review_URL', type: '#', short: 'r',   label: 'Review URL',   ph: 'https://g.page/...', input: 'url' },
+    ]
+  },
+  P08_Resume: {
+    label: 'Resume / CV',
+    tab:   'P08_Resume',
+    fields: [
+      { header: 'Timestamp', type: '!', short: null },
+      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1008', input: 'number' },
+      { header: 'Name',      type: '#', short: 'n',   label: 'Name',        ph: 'Full name',  input: 'text'   },
+      { header: 'Drive_URL', type: '#', short: 'd',   label: 'Drive URL',   ph: 'https://drive.google.com/...', input: 'url' },
+    ]
+  },
+  P09_WiFi: {
+    label: 'WiFi Connect',
+    tab:   'P09_WiFi',
+    fields: [
+      { header: 'Timestamp', type: '!', short: null },
+      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number' },
+      { header: 'Name',      type: '#', short: 'n',   label: 'Name / Label',ph: 'Network name',input: 'text'  },
+      { header: 'SSID',      type: '#', short: 's',   label: 'SSID',        ph: 'WiFi Name',   input: 'text'   },
+      { header: 'Password',  type: '#', short: 'p',   label: 'Password',    ph: 'WiFi Password',input:'text'  },
+    ]
+  },
+  P11_Challan: {
+    label: 'Vehicle Challan',
+    tab:   'P11_Challan',
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1011', input: 'number' },
+      { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Owner name', input: 'text'   },
+      { header: 'Vehicle_No', type: '#', short: 'v',   label: 'Vehicle No.',  ph: 'MH12AB1234', input: 'text'   },
+      { header: 'Engine_No',  type: '#', short: 'e',   label: 'Engine No.',   ph: 'Engine number',input:'text' },
+      { header: 'Chassis_No', type: '#', short: 'c',   label: 'Chassis No.',  ph: 'Chassis number',input:'text'},
+    ]
+  },
+  P12_Invite: {
+    label: 'Event Invite',
+    tab:   'P12_Invite',
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1012',       input: 'number' },
+      { header: 'Name',       type: '#', short: 'n',   label: 'Host Name',   ph: 'Your name',        input: 'text'   },
+      { header: 'PIN',        type: '#', short: 'k',   label: 'PIN (4-digit)',ph: '****',             input: 'text'   },
+      { header: 'Event_Name', type: '#', short: 'ev',  label: 'Event Name',  ph: 'Wedding / Party',  input: 'text'   },
+      { header: 'Date',       type: '#', short: 'dt',  label: 'Event Date',  ph: 'DD/MM/YYYY',       input: 'text'   },
+      { header: 'Maps_Link',  type: '#', short: 'm',   label: 'Maps Link',   ph: 'https://maps.google...', input: 'url' },
+      { header: 'Video_Link', type: '#', short: 'vl',  label: 'Video Link',  ph: 'https://youtube...',input: 'url'   },
+    ]
+  },
+  P15_Static: {
+    label: 'Static Location',
+    tab:   'P15-Static',
+    fields: [
+      { header: 'Timestamp',        type: '!', short: null },
+      { header: 'Cust_ID',          type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1015',          input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Name',             type: '$', short: null,  label: 'Name',           ph: 'Owner / Contact',    input: 'text'   },
+      { header: 'PIN',              type: '#', short: 'k',   label: 'PIN (4-digit)',  ph: '****',               input: 'text'   },
+      { header: 'Name of location', type: '#', short: 'loc', label: 'Name of location', ph: 'Location name',    input: 'text'   },
+      { header: 'Written Address',  type: '#', short: 'wa',  label: 'Written Address',  ph: 'Full address',     input: 'text'   },
+      { header: 'Maps_Link',        type: '#', short: 'm',   label: 'Maps Link',        ph: 'https://maps.google...', input: 'url' },
+      { header: 'Video_Link',       type: '#', short: 'vl',  label: 'Video Link',       ph: 'https://youtube...',     input: 'url' },
+    ]
+  }
+};
+
+let currentService = null;
+
+// ============================================================
+// INIT — populate service buttons
+// ============================================================
+function initServiceButtons() {
+  const grid = document.getElementById('serviceGrid');
+  grid.innerHTML = '';
+  Object.entries(SERVICES).forEach(([key, svc]) => {
+    const btn = document.createElement('button');
+    btn.className = 'svc-btn';
+    btn.id = 'svc_' + key;
+    btn.innerHTML = `<span>${key}</span><span class="svc-dot"></span>`;
+    btn.onclick = () => selectService(key);
+    grid.appendChild(btn);
+  });
+}
+
+function selectCategory(n) {
+  if (n !== 3) { showToast('Category ' + n + ' is not active in this build.', 'info'); return; }
+}
+
+// ============================================================
+// SELECT SERVICE — render form
+// ============================================================
+function selectService(key) {
+  currentService = key;
+  const svc = SERVICES[key];
+
+  // Update active state on buttons
+  document.querySelectorAll('.svc-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('svc_' + key).classList.add('active');
+  // Find the dot inside the active button and style it
+  document.getElementById('svc_' + key).querySelector('.svc-dot').style.background = 'var(--gold)';
+
+  document.getElementById('mainTitle').textContent = svc.label;
+  document.getElementById('mainDesc').textContent =
+    'Tab: ' + svc.tab + ' | Fields: ' + svc.fields.filter(f => f.type !== '!').map(f => f.header).join(', ');
+  document.getElementById('sheetTarget').textContent = 'Sheet: ' + svc.tab;
+
+  generateForm(key, svc);
+}
+
+// ============================================================
+// GENERATE FORM
+// ============================================================
+function generateForm(key, svc) {
+  const userFields = svc.fields.filter(f => f.type === '#' || f.type === '$');
+
+  let fieldsHTML = '';
+
+  // Pair up fields for two-column layout
+  for (let i = 0; i < userFields.length; i += 2) {
+    const f1 = userFields[i];
+    const f2 = userFields[i + 1];
+    if (f2) {
+      fieldsHTML += `<div class="field-row">
+        ${fieldHTML(f1)}
+        ${fieldHTML(f2)}
+      </div>`;
+    } else {
+      fieldsHTML += `<div class="field-row full">${fieldHTML(f1)}</div>`;
+    }
+  }
+
+  document.getElementById('formContainer').innerHTML = `
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-title">${key}</div>
+        <div class="form-card-badge">${svc.label}</div>
+      </div>
+      <div class="form-body">
+        <!-- Auto timestamp display -->
+        <div class="field-row full" style="margin-bottom:1rem;">
+          <div class="field-group">
+            <label class="field-label">
+              <span class="field-symbol sym-auto">!</span>
+              Timestamp
+            </label>
+            <div class="auto-field" id="tsDisplay">Auto-generated on submit</div>
+          </div>
+        </div>
+        ${fieldsHTML}
+        <div class="submit-bar">
+          <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">
+            <span id="btnText">Generate QR + Save</span>
+            <div class="spinner" id="btnSpinner"></div>
+          </button>
+          <button class="btn-reset" onclick="resetForm()">Clear</button>
+        </div>
+        <div class="legend-strip">
+          <div class="legend-item"><span class="field-symbol sym-hash">#</span> QR + Sheet</div>
+          <div class="legend-item"><span class="field-symbol sym-dollar">$</span> Sheet only</div>
+          <div class="legend-item"><span class="field-symbol sym-auto">!</span> Auto</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function fieldHTML(f) {
+  const isId = f.header === 'Cust_ID';
+  const sym = f.type === '#'
+    ? '<span class="field-symbol sym-hash">#</span>'
+    : '<span class="field-symbol sym-dollar">$</span>';
+  return `
+    <div class="field-group">
+      <label class="field-label" for="f_${f.header}">
+        ${sym} ${f.label}
+      </label>
+      <input
+        class="field-input ${isId ? 'id-field' : ''}"
+        id="f_${f.header}"
+        type="${f.input || 'text'}"
+        placeholder="${f.ph || ''}"
+        ${isId ? 'min="1"' : ''}
+        required
+      />
+    </div>
+  `;
+}
+
+// ============================================================
+// SUBMIT HANDLER
+// ============================================================
+async function handleSubmit() {
+  if (!currentService) { showToast('Select a service first.', 'error'); return; }
+  const svc = SERVICES[currentService];
+
+  // Collect values
+  const values = {};
+  const userFields = svc.fields.filter(f => f.type === '#' || f.type === '$');
+  let valid = true;
+
+  for (const f of userFields) {
+    const el = document.getElementById('f_' + f.header);
+    const val = el ? el.value.trim() : '';
+    if (!val) {
+      el.style.borderColor = '#e74c3c';
+      valid = false;
+    } else {
+      el.style.borderColor = '';
+      values[f.header] = val;
+    }
+  }
+
+  if (!valid) { showToast('Please fill all required fields.', 'error'); return; }
+
+  // Auto timestamp
+  const ts = new Date().toLocaleString();
+  values['Timestamp'] = ts;
+  document.getElementById('tsDisplay').textContent = ts;
+
+  // Show spinner
+  setBtnLoading(true);
+
+  // Build SheetDB payload — exact headers in spec order
+  const rowData = {};
+  svc.fields.forEach(f => {
+    const col = f.sheetHeader || f.header;
+    if (f.type === '!') rowData[col] = ts;
+    else rowData[col] = values[f.header] || '';
+  });
+
+  // Build short-key secret for QR (only # fields, excluding Cust_ID which is $)
+  const secret = {};
+  svc.fields.filter(f => f.type === '#').forEach(f => {
+    secret[f.short] = values[f.header];
+  });
+
+  const sEncoded = btoa(JSON.stringify(secret));
+  const custId   = values['Cust_ID'];
+  const name     = encodeURIComponent(values['Name'] || '');
+  const qrURL    = `${SCANNER_URL}?t=${currentService}&n=${name}&id=${custId}&s=${sEncoded}`;
+
+  // POST to SheetDB
+  try {
+    const res = await fetch(`${SHEETDB_BASE}?sheet=${svc.tab}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ data: [rowData] })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('SheetDB error: ' + errText);
+    }
+
+    showToast('Saved to ' + svc.tab + ' successfully!', 'success');
+    renderQR(qrURL, custId, currentService);
+
+  } catch (err) {
+    showToast('Sheet save failed: ' + err.message, 'error');
+    console.error(err);
+  } finally {
+    setBtnLoading(false);
+  }
+}
+
+// ============================================================
+// QR GENERATION
+// ============================================================
+function renderQR(url, custId, serviceKey) {
+  const qrBox = document.getElementById('qrBox');
+  const qrDiv = document.getElementById('qrCode');
+  const qrPlaceholder = document.getElementById('qrPlaceholder');
+  const idDisplay = document.getElementById('qrIdDisplay');
+  const urlPreview = document.getElementById('urlPreview');
+  const btnDl = document.getElementById('btnDownload');
+
+  // Clear previous
+  qrDiv.innerHTML = '';
+
+  // Generate
+  new QRCode(qrDiv, {
+    text:         url,
+    width:        192,
+    height:       192,
+    colorDark:    '#0a0a0f',
+    colorLight:   '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  qrPlaceholder.style.display = 'none';
+  qrBox.style.display = 'flex';
+
+  // Show Cust_ID clearly
+  document.getElementById('qrIdValue').textContent = custId;
+  document.getElementById('qrServiceTag').textContent = serviceKey + ' | ' + SERVICES[serviceKey].label;
+  idDisplay.style.display = 'flex';
+
+  // Show full URL preview (no truncation)
+  document.getElementById('urlPreviewVal').textContent = url;
+  urlPreview.style.display = 'flex';
+
+  btnDl.style.display = 'block';
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#qrCode canvas');
+  if (!canvas) { showToast('No QR to download.', 'error'); return; }
+  const link = document.createElement('a');
+  link.download = '10haath_qr_' + currentService + '_' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function resetForm() {
+  document.querySelectorAll('.field-input').forEach(el => {
+    el.value = '';
+    el.style.borderColor = '';
+  });
+  if (document.getElementById('tsDisplay'))
+    document.getElementById('tsDisplay').textContent = 'Auto-generated on submit';
+}
+
+function setBtnLoading(state) {
+  const btn = document.getElementById('btnSubmit');
+  const txt = document.getElementById('btnText');
+  const sp  = document.getElementById('btnSpinner');
+  if (!btn) return;
+  btn.disabled = state;
+  txt.textContent = state ? 'Saving...' : 'Generate QR + Save';
+  sp.style.display = state ? 'block' : 'none';
+}
+
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+initServiceButtons();
+</script>
+</body>
+</html>
