@@ -437,99 +437,97 @@
   </div>
 </div>
 
-<!-- ===== P00_HUMAN & P00_VALUE (Role Select) ===== -->
-<div id="page_Role_Select" class="page">
+<!-- ===== SAVIOR_STEP_1 (Verify via WA) ===== -->
+<div id="page_Savior_Step1" class="page">
   <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge" id="role_service_label">Safety QR</div>
-    </div>
-    <div class="card-body" style="text-align:center;">
-      <div class="heading-sm" id="role_name">---</div>
-      <div class="sub-text" style="margin-bottom:1.5rem;">Please select your role to proceed.</div>
-      
-      <div class="btn-group">
-        <button class="btn-primary btn-green" onclick="switchToSavior()">
-          I found this person/asset
-          <span style="font-size:0.7rem;opacity:0.8;display:block;font-weight:400;">(Savior / Help)</span>
-        </button>
-        <button class="btn-secondary" onclick="switchToOwner()">
-          I am the Owner
-          <span style="font-size:0.7rem;opacity:0.6;display:block;font-weight:400;">(PIN Protected)</span>
-        </button>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono" id="role_type_tag">P00</div>
-    </div>
+    <div style="font-size: 3rem; margin-top: 1rem;">🚨</div>
+    <h2 style="color:#e63946; margin-top:0.5rem;">Gadi Alert System</h2>
+    <p class="sub-text">Gadi ke maalik ko emergency alert bhejne ke liye WhatsApp verify karein.</p>
+    
+    <a href="#" id="wa_verify_btn" target="_blank" class="btn-primary btn-green" style="margin-top: 1.5rem; text-decoration: none;" onclick="goToStep2()">
+       Verify via WhatsApp
+    </a>
+    <button class="btn-secondary" onclick="history.back()" style="margin-top:1rem;">Back</button>
   </div>
 </div>
 
-<!-- ===== OWNER_LOGIN (PIN) ===== -->
-<div id="page_Owner_Login" class="page">
+<!-- ===== SAVIOR_STEP_2 (Confirm Alert) ===== -->
+<div id="page_Savior_Step2" class="page">
   <div class="card">
     <div class="card-header">
       <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Owner Login</div>
+      <div class="service-badge">Confirm Alert</div>
     </div>
-    <div class="card-body" style="text-align:center;">
-      <div class="heading-sm">Enter Security PIN</div>
-      <div class="sub-text" style="margin-bottom:1rem;">Verify you are the owner of this QR.</div>
-      <div class="pin-input-group">
-        <input class="pin-digit" maxlength="1" id="ol_pin0" oninput="pinNextOL(0)" onkeydown="pinBackOL(event,0)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="ol_pin1" oninput="pinNextOL(1)" onkeydown="pinBackOL(event,1)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="ol_pin2" oninput="pinNextOL(2)" onkeydown="pinBackOL(event,2)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="ol_pin3" oninput="pinNextOL(3)" onkeydown="pinBackOL(event,3)" inputmode="numeric"/>
+    <div class="card-body">
+      <div class="challan-label">Vehicle Number (Verified)</div>
+      <input class="challan-field" id="savior_gadi_readonly" type="text" readonly style="background:#eee; color:#888;">
+
+      <div class="challan-label">Your Mobile Number</div>
+      <input class="challan-field" id="savior_phone" type="number" placeholder="WhatsApp Number jisse message bheja">
+
+      <div class="challan-label">Select/Write Problem</div>
+      <textarea class="challan-field" id="savior_reason" rows="3" placeholder="Gadi lock hai / Shisha khula hai / Emergency..."></textarea>
+
+      <div style="margin-top: 15px; padding: 12px; background: #fff4f4; border-radius: 10px; border: 1px solid #ffcccc; text-align: left;">
+        <p style="font-size: 11px; color: #d63031; margin: 0; line-height: 1.5; font-weight: 600;">
+          ⚠️ <span style="text-decoration: underline;">Sachet (Alert):</span> Aapka WhatsApp number verification ke liye hamare server par record kiya ja chuka hai. 
+          <br><br>
+          Kisi dusre ki gadi ke saath shararat karna ya galat jankari dena kanoonan apradh hai.
+        </p>
       </div>
-      <div id="ol_pinError" style="font-size:0.78rem;color:#e74c3c;min-height:1.2rem;"></div>
-      <button class="btn-primary" onclick="verifyOwnerPin()" style="margin-top:0.75rem;">Verify PIN</button>
+
+      <button class="btn-primary" id="savior_submitBtn" onclick="submitSaviorAlertExact()" style="margin-top:1.5rem;">Final Submit</button>
       <button class="btn-secondary" onclick="history.back()" style="margin-top:0.5rem;">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- ===== OWNER_DASHBOARD (Cat 1 Only) ===== -->
-<div id="page_Owner_Dash" class="page">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Owner Dashboard</div>
+<!-- ===== OWNER_SOS_DASHBOARD (Cat 1 & 2) ===== -->
+<div id="page_Owner_SOS" class="page">
+  <div class="card" style="max-width: 500px;">
+    <div class="tabs" style="display:flex; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
+      <div class="tab" style="flex:1; padding:12px; background:#eee; color:#666; font-weight:bold; cursor:pointer;" onclick="switchToSavior()">Savior</div>
+      <div class="tab active" style="flex:1; padding:12px; background:var(--dark); color:white; font-weight:bold; cursor:pointer;">Owner</div>
     </div>
-    <div class="card-body">
-      <div class="heading-sm" id="od_name">---</div>
-      <div class="sub-text">Update your status and emergency alert.</div>
-      <div class="divider"></div>
+
+    <div id="owner_lock_view">
+      <h2 style="text-align:left; font-size: 1.8rem; margin-bottom:1rem;">Step 2: Owner SOS</h2>
+      <div class="challan-label">SECURITY PIN</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <input class="challan-field" id="owner_sos_pin" type="password" placeholder="****" style="flex:1;">
+        <button class="btn-primary btn-green" onclick="unlockOwnerSOS()" style="width:auto; padding: 10px 20px; margin:0;">Unlock SOS</button>
+      </div>
+      <div id="owner_pin_err" style="color:red; font-size:0.8rem; margin-top:5px;"></div>
+    </div>
+
+    <div id="owner_sos_view" style="display:none;">
+      <h2 style="text-align:left; font-size: 1.8rem; margin-bottom:1rem;">Step 2: Owner SOS</h2>
       
-      <div class="btn-group" style="margin-bottom:1rem;">
-        <a class="btn-primary btn-blue" href="https://www.google.com/maps" target="_blank" rel="noopener">
-          1. Open Google Maps
-          <span style="font-size:0.7rem;opacity:0.8;display:block;font-weight:400;">(To get your location share link)</span>
-        </a>
+      <button class="btn-primary btn-green" style="margin-bottom:1.5rem;" onclick="window.open('https://www.google.com/maps', '_blank')">
+        OPEN GOOGLE MAPS (LIVE SHARE)
+      </button>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:left;">
+        <div>
+          <label class="challan-label" style="font-size: 0.7rem;">LIVE LOCATION LINK</label>
+          <input class="challan-field" id="owner_loc_link" type="text" placeholder="">
+        </div>
+        <div>
+          <label class="challan-label" style="font-size: 0.7rem;">CONFIRM LINK (PASTE HERE)</label>
+          <input class="challan-field" id="owner_loc_confirm" type="text" placeholder="Paste Google live location link">
+        </div>
       </div>
 
-      <div class="challan-label">2. Paste Location Link Here</div>
-      <input class="challan-field" id="od_loc_link" placeholder="https://maps.app.goo.gl/..."/>
-      
-      <div class="challan-label">Help Message (Optional)</div>
-      <textarea class="challan-field" id="od_help_msg" rows="2" placeholder="e.g. Please help me, I am at this location."></textarea>
-      
-      <button class="btn-primary btn-green" id="od_updateBtn" onclick="updateOwnerStatus()">
-        Update Status & Send Help Alert
-      </button>
-      <button class="btn-secondary" onclick="history.back()" style="margin-top:0.5rem;">Back</button>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:1.5rem;">
+        <button class="btn-primary" style="background:#d9822b; margin:0;" onclick="copyOwnerLink()">COPY LINK</button>
+        <button class="btn-primary" style="background:#e63946; margin:0;" onclick="confirmAndSaveOwnerSOS()">CONFIRM & SAVE</button>
+      </div>
+
+      <p class="sub-text" style="text-align:left; font-size:0.75rem; margin-top:1rem;">
+        Tip: Google Maps khul gaya hai. Wahan <b>Share live location</b> link copy karke yahan paste karein.
+      </p>
     </div>
   </div>
-</div>
-
-<!-- ===== P00_HUMAN (Old) ===== -->
-<div id="page_P00_Human" class="page">
-  <!-- Removed old content as we now use Role_Select -->
-</div>
-
-<!-- ===== P00_VALUE (Old) ===== -->
-<div id="page_P00_Value" class="page">
-  <!-- Removed old content as we now use Role_Select -->
 </div>
 
 <!-- ===== SAVIOR_FORM (Universal for Cat 1 & 2) ===== -->
@@ -921,17 +919,18 @@ function route() {
   }
 }
 
+const SHEETDB_BASE = 'https://sheetdb.io/api/v1/vpozwh7cptzc4';
+const COMPANY_WA = '919718531983';
+
 // ============================================================
 // P00_HUMAN — Human Safety
 // ============================================================
 let _humanSecret = {};
 function routeHuman(s, n) {
   _humanSecret = s;
-  const name = s.n || n || 'Unknown';
-  document.getElementById('role_name').textContent = name;
-  document.getElementById('role_service_label').textContent = 'Human Safety';
-  document.getElementById('role_type_tag').textContent = 'P00_HUMAN';
-  showPage('page_Role_Select');
+  const gadi = s.n || n || 'Unknown';
+  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
+  showPage('page_Savior_Step1');
 }
 
 // ============================================================
@@ -940,180 +939,143 @@ function routeHuman(s, n) {
 let _valueSecret = {};
 function routeValue(s, n) {
   _valueSecret = s;
-  const name = s.n || n || 'Valuable Asset';
-  document.getElementById('role_name').textContent = name;
-  document.getElementById('role_service_label').textContent = 'Value Safety';
-  document.getElementById('role_type_tag').textContent = 'P00_VALUE';
-  showPage('page_Role_Select');
+  const gadi = s.n || n || 'Valuable Asset';
+  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
+  showPage('page_Savior_Step1');
 }
 
 // ============================================================
-// ROLE SWITCHING
+// SAVIOR WORKFLOW (Cat 1 & 2)
 // ============================================================
-function switchToSavior() {
-  const t = getParams().t;
-  // Step 1: Show the WA Alert Button page (using Savior_Form but initially showing a button)
-  showPage('page_Savior_Form');
-  document.getElementById('savior_form_content').style.display = 'none';
-  document.getElementById('savior_verify_view').style.display = 'block';
+function goToStep2() {
+  setTimeout(function() {
+    const t = getParams().t;
+    const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
+    const gadi = s.n || getParams().n || 'N/A';
+    document.getElementById('savior_gadi_readonly').value = gadi;
+    showPage('page_Savior_Step2');
+  }, 1500);
 }
 
-function switchToOwner() {
-  showPage('page_Owner_Login');
-  resetOwnerPin();
-}
-
-// ============================================================
-// SAVIOR ALERT — Cat 1 & 2 logic
-// ============================================================
-function startSaviorForm() {
-  document.getElementById('savior_verify_view').style.display = 'none';
-  document.getElementById('savior_form_content').style.display = 'block';
-}
-
-async function submitSaviorAlert() {
+async function submitSaviorAlertExact() {
   const phone = document.getElementById('savior_phone').value.trim();
   const reason = document.getElementById('savior_reason').value.trim();
-  
-  if (phone.length < 10) { alert('Sahi WhatsApp number bharein!'); return; }
-  if (!reason) { alert('Dikkat batayein!'); return; }
+  const t = getParams().t;
+  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
+  const gadi = s.n || getParams().n || 'N/A';
+
+  if(phone.length < 10) { alert("Kripya sahi WhatsApp number bharein!"); return; }
+  if(!reason) { alert("Dikkat batayein!"); return; }
   
   const btn = document.getElementById('savior_submitBtn');
-  btn.innerText = 'Sending Alert...';
+  btn.innerText = "Processing..."; 
   btn.disabled = true;
 
-  const t = getParams().t;
-  const secret = t === 'P00_Human' ? _humanSecret : _valueSecret;
-  const assetName = secret.n || 'N/A';
-  const recipients = [secret.e1, secret.e2].filter(Boolean).join(',');
-  
-  // 1. Send to SheetDB
+  // 1. Save to Sheet
   try {
     await fetch(SHEETDB_BASE + '?sheet=All_Alerts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: [{
         Timestamp: new Date().toLocaleString(),
-        Asset_Name: assetName,
+        Asset_Name: gadi,
         Scanner_Phone: phone,
         Reason: reason,
-        Service: t
+        Service: t,
+        Status: "VERIFIED"
       }]})
     });
   } catch(e) { console.error('Sheet save failed', e); }
 
   // 2. Open Mailto
-  const subject = encodeURIComponent('🚨 10haath Alert: ' + assetName);
+  const recipients = [s.e1, s.e2].filter(Boolean).join(',');
+  const subject = encodeURIComponent("🚨 Gadi Alert: " + gadi);
   const body = encodeURIComponent(
-    'Namaste,\n\nAapke asset/person (' + assetName + ') ke saath ye dikkat hai:\n' + 
-    '👉 ' + reason + '\n\n' +
-    'Main wahan hoon. Aap mujhe is number par contact kar sakte hain: ' + phone + '\n\n' +
-    '- Sent via 10haath Smart QR'
+    "Namaste,\n\nAapki gadi (" + gadi + ") ke saath ye dikkat hai:\n" + 
+    "👉 " + reason + "\n\n" +
+    "Main gadi ke paas khada hoon. Aap mujhe is number par contact kar sakte hain: " + phone + "\n\n" +
+    "- Sent via Smart QR System"
   );
   
-  window.location.href = 'mailto:' + recipients + '?subject=' + subject + '&body=' + body;
-  btn.innerText = 'Alert Sent!';
+  window.location.href = "mailto:" + recipients + "?subject=" + subject + "&body=" + body;
+  btn.innerText = "Email App Opened!";
 }
 
-// ============================================================
-// OWNER LOGIN & DASHBOARD
-// ============================================================
-function pinNextOL(idx) {
-  const el = document.getElementById('ol_pin' + idx);
-  el.classList.add('filled');
-  if (el.value && idx < 3) document.getElementById('ol_pin' + (idx + 1)).focus();
-  if (idx === 3 && el.value) verifyOwnerPin();
-}
-
-function pinBackOL(e, idx) {
-  if (e.key === 'Backspace') {
-    const el = document.getElementById('ol_pin' + idx);
-    if (!el.value && idx > 0) {
-      document.getElementById('ol_pin' + (idx - 1)).focus();
-      document.getElementById('ol_pin' + (idx - 1)).value = '';
-    }
-  }
-}
-
-function resetOwnerPin() {
-  [0,1,2,3].forEach(i => {
-    const el = document.getElementById('ol_pin' + i);
-    el.value = '';
-    el.classList.remove('filled', 'error');
-  });
-  document.getElementById('ol_pin0').focus();
-  document.getElementById('ol_pinError').textContent = '';
-}
-
-function verifyOwnerPin() {
-  const entered = [0,1,2,3].map(i => document.getElementById('ol_pin' + i).value).join('');
+function switchToSavior() {
   const t = getParams().t;
-  const secret = t === 'P00_Human' ? _humanSecret : _valueSecret;
-  const correct = String(secret.k || '');
+  if (t === 'P00_Human') routeHuman(_humanSecret, getParams().n);
+  else routeValue(_valueSecret, getParams().n);
+}
 
-  if (entered === correct) {
-    if (t === 'P00_Human') {
-      showOwnerDash();
-    } else {
-      alert('Owner verified! Role: Value Safety');
-      // For Cat 2, maybe just show a simple status or similar
-    }
+function switchToOwner() {
+  showPage('page_Owner_SOS');
+  document.getElementById('owner_lock_view').style.display = 'block';
+  document.getElementById('owner_sos_view').style.display = 'none';
+  document.getElementById('owner_sos_pin').value = '';
+  document.getElementById('owner_pin_err').textContent = '';
+}
+
+// ============================================================
+// OWNER SOS WORKFLOW
+// ============================================================
+function unlockOwnerSOS() {
+  const pin = document.getElementById('owner_sos_pin').value;
+  const t = getParams().t;
+  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
+  const correct = String(s.k || '');
+
+  if (pin === correct) {
+    document.getElementById('owner_lock_view').style.display = 'none';
+    document.getElementById('owner_sos_view').style.display = 'block';
   } else {
-    document.getElementById('ol_pinError').textContent = 'Incorrect PIN.';
-    [0,1,2,3].forEach(i => {
-      const el = document.getElementById('ol_pin' + i);
-      el.classList.add('error');
-      setTimeout(() => el.classList.remove('error'), 600);
-      el.value = '';
-      el.classList.remove('filled');
-    });
-    document.getElementById('ol_pin0').focus();
+    document.getElementById('owner_pin_err').textContent = 'Incorrect PIN.';
   }
 }
 
-function showOwnerDash() {
-  showPage('page_Owner_Dash');
-  document.getElementById('od_name').textContent = _humanSecret.n || 'Owner';
+function copyOwnerLink() {
+  const link = document.getElementById('owner_loc_link').value;
+  if (!link) return alert("Pehle link paste karein!");
+  navigator.clipboard.writeText(link).then(() => {
+    alert("Link copied!");
+  });
 }
 
-async function updateOwnerStatus() {
-  const locLink = document.getElementById('od_loc_link').value.trim();
-  const helpMsg = document.getElementById('od_help_msg').value.trim();
-  
-  if (!locLink) { alert('Please paste your location link first!'); return; }
-  
-  const btn = document.getElementById('od_updateBtn');
-  btn.innerText = 'Updating Sheet...';
-  btn.disabled = true;
+async function confirmAndSaveOwnerSOS() {
+  const link = document.getElementById('owner_loc_link').value.trim();
+  const confirm = document.getElementById('owner_loc_confirm').value.trim();
+  const t = getParams().t;
+  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
 
-  // 1. Save to Sheet (Updates Owner's location link in Registration or similar)
-  // For simplicity, we'll save to a specific "Live_Status" sheet
+  if (!link || link !== confirm) {
+    alert("Links match nahi kar rahe ya khali hain!");
+    return;
+  }
+
+  const btn = document.getElementById('od_updateBtn'); // Note: button ID might be different in new layout
+  // Let's just use the event target or find it
+  
+  // 1. Save to Live_Status sheet
   try {
     await fetch(SHEETDB_BASE + '?sheet=Live_Status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: [{
         Timestamp: new Date().toLocaleString(),
-        Cust_ID: _humanSecret.c,
-        Name: _humanSecret.n,
-        Location_Link: locLink,
-        Message: helpMsg
+        'Cust_ID(No.)': s.c,
+        Name: s.n,
+        Location_Link: link,
+        Service: t
       }]})
     });
   } catch(e) { console.error('Status update failed', e); }
 
-  // 2. Redirect to WhatsApp Emergency Contact
-  const emergencyNo = _humanSecret.e;
-  const msg = encodeURIComponent(
-    'HELP! I am at this location: ' + locLink + '\n' + helpMsg + '\n- Sent via 10haath Owner Dash'
-  );
-  
-  window.location.href = `https://wa.me/${emergencyNo}?text=${msg}`;
-  btn.innerText = 'Update Sent!';
+  // 2. Redirect to WA Emergency
+  const msg = encodeURIComponent(`HELP! I am at this location: ${link}\n- Sent via 10haath Owner SOS`);
+  window.location.href = `https://wa.me/${s.e}?text=${msg}`;
 }
 
 // ============================================================
-// P13_DOC — Security Vault
+// P13_DOC — Security Vault (20 min timer)
 // ============================================================
 let _p13Timer = null;
 let _p13Secret = {};
@@ -1123,30 +1085,17 @@ function routeDoc(s, n) {
   document.getElementById('p13_name').textContent = s.n || n || 'Doc Vault';
   document.getElementById('p13_gadi').textContent = 'Vehicle: ' + (s.v || '---');
   
-  // Reset view
-  document.getElementById('p13_timer_view').style.display = 'block';
-  document.getElementById('p13_folder_view').style.display = 'none';
-  document.getElementById('p13_timer').textContent = '20:00';
-  
-  showPage('page_P13_Doc');
-}
-
-function requestDocAccess() {
-  const btn = document.getElementById('p13_accessBtn');
-  btn.innerText = 'Requesting Access...';
-  btn.disabled = true;
-
-  // Start Timer
-  startP13Timer(1200); // 20 minutes
-
-  // In a real app, this would send a push notification or email to owner
-  // Here we just simulate it and show the folder link after a short delay
-  setTimeout(() => {
+  // Important: viewBtn href is the decoded link
+  document.getElementById('p13_accessBtn').onclick = function() {
+    startP13Timer(1200);
+    window.open(s.dl, '_blank');
+    // Show password folder view after click
     document.getElementById('p13_timer_view').style.display = 'none';
     document.getElementById('p13_folder_view').style.display = 'block';
-    document.getElementById('p13_folderLink').href = _p13Secret.dl || '#';
-    document.getElementById('p13_pdf_pass').value = ''; // Clear password field
-  }, 1500);
+    document.getElementById('p13_folderLink').href = s.dl;
+  };
+  
+  showPage('page_P13_Doc');
 }
 
 function startP13Timer(sec) {
@@ -1158,7 +1107,7 @@ function startP13Timer(sec) {
     document.getElementById('p13_timer').textContent = `${mins}:${rem < 10 ? '0' : ''}${rem}`;
     if (sec <= 0) {
       clearInterval(_p13Timer);
-      document.getElementById('page_P13_Doc').innerHTML = '<div class="card"><div class="card-body"><h1>Access Expired!</h1><p>Please scan the QR again.</p></div></div>';
+      document.body.innerHTML = "<h1>Link Expired!</h1>";
     }
   }, 1000);
 }
