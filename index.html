@@ -651,9 +651,12 @@
       <div class="qr-service-tag" id="qrServiceTag">---</div>
     </div>
 
-    <div id="urlPreview" class="url-preview">
-      <div class="url-preview-label">Encoded URL</div>
+    <div id="urlPreview" class="url-preview" style="display:none; flex-direction:column; gap:0.5rem; align-items:flex-start; width:100%;">
+      <div class="url-preview-label">QR Link:</div>
       <div class="url-preview-val" id="urlPreviewVal">---</div>
+      <button class="btn-download" style="width:auto; padding: 6px 12px; font-size: 0.75rem; display: block;" onclick="copyQRLink()">
+        Copy Link
+      </button>
     </div>
 
     <button class="btn-download" id="btnDownload" onclick="downloadQR()">
@@ -678,15 +681,14 @@
 // CONFIG — Exact tab names & column headers per spec
 // ============================================================
 const SHEETDB_BASE = 'https://sheetdb.io/api/v1/vpozwh7cptzc4';
-// Always generate a full absolute URL for the scanner page
-const SCANNER_URL  = new URL('scanner_tabs.html', window.location.href).toString();
+const SCANNER_URL = "https://shishupalji1855-hue.github.io/10/scanner_tabs.html";
 
 // Each service: fields array ordered as per spec
 // type: '#' = QR+Sheet, '$' = Sheet only, '!' = auto
 const SERVICES = {
   P00_Human: {
     label: 'Human Safety',
-    tab:   'P00_Human',
+    tab:   'Registration', // Saves to main Registration tab
     cat:   1,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
@@ -701,7 +703,7 @@ const SERVICES = {
   },
   P00_Value: {
     label: 'Value Safety',
-    tab:   'P00_Value',
+    tab:   'Registration', // Saves to main Registration tab
     cat:   2,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
@@ -787,7 +789,7 @@ const SERVICES = {
   },
   P13_Doc: {
     label: 'Doc Vault',
-    tab:   'P13_Doc',
+    tab:   'Registration', // Saves to main Registration tab with I, J, K columns
     cat:   4,
     fields: [
       { header: 'Timestamp',        type: '!', short: null },
@@ -1078,11 +1080,23 @@ function renderQR(url, custId, serviceKey) {
   document.getElementById('qrServiceTag').textContent = serviceKey + ' | ' + SERVICES[serviceKey].label;
   idDisplay.style.display = 'flex';
 
-  // Show full URL preview (no truncation)
-  document.getElementById('urlPreviewVal').textContent = url;
-  urlPreview.style.display = 'flex';
+  // Show URL preview and Download button (unless it's WiFi)
+  if (serviceKey !== 'P09_WiFi') {
+    document.getElementById('urlPreviewVal').textContent = url;
+    urlPreview.style.display = 'flex';
+    btnDl.style.display = 'block';
+  } else {
+    urlPreview.style.display = 'none';
+    btnDl.style.display = 'none';
+  }
+}
 
-  btnDl.style.display = 'block';
+function copyQRLink() {
+  const url = document.getElementById('urlPreviewVal').textContent;
+  if (!url || url === '---') return;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('QR Link copied to clipboard!', 'success');
+  });
 }
 
 function downloadQR() {

@@ -437,6 +437,35 @@
   </div>
 </div>
 
+<!-- ===== ROLE_SELECT (Cat 1 & 2) ===== -->
+<div id="page_Role_Select" class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-logo">10<span>haath</span></div>
+      <div class="service-badge" id="role_service_label">Safety QR</div>
+    </div>
+    <div class="card-body" style="text-align:center;">
+      <div class="heading-sm" id="role_name">---</div>
+      <div class="sub-text" style="margin-bottom:1.5rem;">Please select your role to proceed.</div>
+      
+      <div class="btn-group">
+        <button class="btn-primary btn-green" onclick="switchToSavior()">
+          Savior
+          <span style="font-size:0.7rem;opacity:0.8;display:block;font-weight:400;">(I found this person/asset)</span>
+        </button>
+        <button class="btn-secondary" id="owner_role_btn" onclick="switchToOwner()">
+          Owner
+          <span style="font-size:0.7rem;opacity:0.6;display:block;font-weight:400;">(PIN Protected)</span>
+        </button>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="footer-brand">10<span>haath</span></div>
+      <div class="footer-type mono" id="role_type_tag">P00</div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== SAVIOR_STEP_1 (Verify via WA) ===== -->
 <div id="page_Savior_Step1" class="page">
   <div class="card">
@@ -928,9 +957,12 @@ const COMPANY_WA = '919718531983';
 let _humanSecret = {};
 function routeHuman(s, n) {
   _humanSecret = s;
-  const gadi = s.n || n || 'Unknown';
-  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
-  showPage('page_Savior_Step1');
+  const name = s.n || n || 'Unknown';
+  document.getElementById('role_name').textContent = name;
+  document.getElementById('role_service_label').textContent = 'Human Safety';
+  document.getElementById('role_type_tag').textContent = 'P00_HUMAN';
+  document.getElementById('owner_role_btn').style.display = 'block'; // Show owner tab for Cat 1
+  showPage('page_Role_Select');
 }
 
 // ============================================================
@@ -939,9 +971,12 @@ function routeHuman(s, n) {
 let _valueSecret = {};
 function routeValue(s, n) {
   _valueSecret = s;
-  const gadi = s.n || n || 'Valuable Asset';
-  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
-  showPage('page_Savior_Step1');
+  const name = s.n || n || 'Valuable Asset';
+  document.getElementById('role_name').textContent = name;
+  document.getElementById('role_service_label').textContent = 'Value Safety';
+  document.getElementById('role_type_tag').textContent = 'P00_VALUE';
+  document.getElementById('owner_role_btn').style.display = 'none'; // Hide owner tab for Cat 2 as per spec
+  showPage('page_Role_Select');
 }
 
 // ============================================================
@@ -1001,10 +1036,15 @@ async function submitSaviorAlertExact() {
   btn.innerText = "Email App Opened!";
 }
 
+// ============================================================
+// ROLE SWITCHING
+// ============================================================
 function switchToSavior() {
   const t = getParams().t;
-  if (t === 'P00_Human') routeHuman(_humanSecret, getParams().n);
-  else routeValue(_valueSecret, getParams().n);
+  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
+  const gadi = s.n || getParams().n || 'Unknown';
+  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
+  showPage('page_Savior_Step1');
 }
 
 function switchToOwner() {
