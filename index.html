@@ -690,9 +690,9 @@ const SERVICES = {
     // key mapping: full header -> 1-letter short key (for QR compression)
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number' },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',     input: 'text'   },
-      { header: 'QR_Link_ID', type: '#', short: 'u',   label: 'QR Link ID',   ph: 'https://...',   input: 'text'   },
+      { header: 'QR_Link_ID', type: '#', short: 'u',   label: 'QR Link ID',   ph: 'https://...',   input: 'text', sheetHeader: 'UPI_ID' },
     ]
   },
   P03_Biz: {
@@ -700,7 +700,7 @@ const SERVICES = {
     tab:   'P03_Biz',
     fields: [
       { header: 'Timestamp',    type: '!', short: null },
-      { header: 'Cust_ID',      type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1002',   input: 'number' },
+      { header: 'Cust_ID',      type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1002',   input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',         type: '#', short: 'n',   label: 'Name',           ph: 'Full name',   input: 'text'   },
       { header: 'Job',          type: '#', short: 'j',   label: 'Job / Title',    ph: 'Designation', input: 'text'   },
       { header: 'Phone',        type: '#', short: 'p',   label: 'Phone',          ph: '+91XXXXXXXXXX',input:'text'  },
@@ -712,7 +712,7 @@ const SERVICES = {
     tab:   'P04_Review',
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1003', input: 'number' },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1003', input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',  input: 'text'   },
       { header: 'Review_URL', type: '#', short: 'r',   label: 'Review URL',   ph: 'https://g.page/...', input: 'url' },
     ]
@@ -722,7 +722,7 @@ const SERVICES = {
     tab:   'P08_Resume',
     fields: [
       { header: 'Timestamp', type: '!', short: null },
-      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1008', input: 'number' },
+      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1008', input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',      type: '#', short: 'n',   label: 'Name',        ph: 'Full name',  input: 'text'   },
       { header: 'Drive_URL', type: '#', short: 'd',   label: 'Drive URL',   ph: 'https://drive.google.com/...', input: 'url' },
     ]
@@ -732,7 +732,7 @@ const SERVICES = {
     tab:   'P09_WiFi',
     fields: [
       { header: 'Timestamp', type: '!', short: null },
-      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number' },
+      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'SSID',      type: '#', short: 's',   label: 'WiFi Name (SSID)', ph: 'Network name', input: 'text' },
       { header: 'Password',  type: '#', short: 'p',   label: 'Password', ph: 'WiFi password', input: 'text' },
     ]
@@ -742,7 +742,7 @@ const SERVICES = {
     tab:   'P12_Invite',
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1012',       input: 'number' },
+      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1012',       input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Host Name',   ph: 'Your name',        input: 'text'   },
       { header: 'PIN',        type: '#', short: 'k',   label: 'PIN (4-digit)',ph: '****',             input: 'text'   },
       { header: 'Event_Name', type: '#', short: 'ev',  label: 'Event Name',  ph: 'Wedding / Party',  input: 'text'   },
