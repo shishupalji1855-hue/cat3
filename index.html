@@ -727,16 +727,17 @@
         setLoading(true);
         try {
             // --- EXACT NOTEPAD POST LOGIC ---
+            // Try different SheetDB URL formats to ensure compatibility
             const primaryUrl = `${SHEETDB_URL}/${activeSvc}`;
             const altUrl = `${SHEETDB_URL}?sheet=${encodeURIComponent(activeSvc)}`;
 
             let response = await fetch(primaryUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload) // Single object, no 'data' wrapper as per notepad
+                body: JSON.stringify(payload)
             });
 
-            if (!response.ok && response.status === 404) {
+            if (!response.ok) {
                 response = await fetch(altUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

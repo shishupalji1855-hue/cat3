@@ -159,12 +159,23 @@
     async function init() {
         const params = new URLSearchParams(window.location.search);
         const s = params.get('s');
-        if(!s) return alert("Invalid QR Code!");
+        const t = params.get('t'); // Support for direct 't' and 'id' params from notepad
+        const id = params.get('id');
 
         try {
-            const payload = JSON.parse(atob(s));
-            serviceType = payload.t;
-            customerId = payload.c;
+            if(s) {
+                // Support both standard base64 and URL-safe base64
+                let base64 = s.replace(/-/g, '+').replace(/_/g, '/');
+                while (base64.length % 4) base64 += '=';
+                const payload = JSON.parse(atob(base64));
+                serviceType = payload.t || payload.type;
+                customerId = payload.c || payload.n || payload.id;
+            } else if(t && id) {
+                serviceType = t;
+                customerId = id;
+            } else {
+                throw new Error("Invalid QR Link!");
+            }
             
             // Map Cust_ID header based on service
             let idHeader = "Cust_ID";
