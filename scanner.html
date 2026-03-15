@@ -176,7 +176,10 @@
             const response = await fetch(`${SHEETDB_URL}/search?${idHeader}=${customerId}&sheet=${serviceType}`);
             const data = await response.json();
             
-            if(!data || data.length === 0) throw new Error("Tag data not found!");
+            if(!Array.isArray(data) || data.length === 0) {
+                console.error("SheetDB Error or No Data:", data);
+                throw new Error("Tag data not found or API error!");
+            }
             currentData = data[0];
 
             renderUI();
@@ -248,6 +251,12 @@
 
     // --- Savior Logic ---
     function showSaviorForm() {
+        // First open WhatsApp to verify/notify
+        const companyWA = currentData.WACompany || "919718531983";
+        const msg = `Verify Alert for ${customerId}`;
+        window.open(`https://wa.me/${companyWA}?text=${encodeURIComponent(msg)}`, '_blank');
+        
+        // Then show the form
         document.getElementById('waStep').classList.add('hidden');
         document.getElementById('saviorForm').classList.remove('hidden');
     }
@@ -382,9 +391,11 @@
     }
 
     async function requestDocAccess() {
-        // In a real app, this would notify the owner. 
-        // For now, we simulate by showing the password box.
-        alert("Access Request Sent to Owner! Please wait for the password.");
+        const ownerPhone = currentData.Emergency1 || currentData.WACompany || "919718531983";
+        const msg = `🚨 Doc Vault Access Request!\nOwner Name: ${currentData.Name}\nVehicle: ${currentData.Gadi_Number || customerId}\nPlease share the PDF password with the requester.`;
+        window.open(`https://wa.me/${ownerPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        
+        alert("Access Request Sent to Owner via WhatsApp! Please wait for the password.");
         document.getElementById('docRequestArea').classList.add('hidden');
         document.getElementById('docPasswordArea').classList.remove('hidden');
     }
