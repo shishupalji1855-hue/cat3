@@ -706,6 +706,12 @@
         `;
     }
 
+    function base64UrlEncode(obj) {
+        const json = JSON.stringify(obj);
+        const b64 = btoa(unescape(encodeURIComponent(json)));
+        return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
     async function handleSubmit() {
         const svc = SERVICES[activeSvc];
         const payload = { Timestamp: new Date().toLocaleString() };
@@ -778,11 +784,13 @@
             qrData = `WIFI:S:${data.SSID};T:${data.Security || 'WPA'};P:${data.Password};;`;
             document.getElementById('qrLinkInfo').classList.add('hidden');
         } else {
+            const shortName = (data.Person_Name || data.Gadi_Number || data.Name || data.Business_Name || data.Location_Name || "") + "";
             const payload = {
                 t: activeSvc,
-                c: data[idHeader]
+                c: data[idHeader],
+                n: shortName
             };
-            const encoded = btoa(JSON.stringify(payload));
+            const encoded = base64UrlEncode(payload);
             qrData = `${SCANNER_URL}?s=${encoded}`;
             
             document.getElementById('qrLinkText').innerText = qrData;
