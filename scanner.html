@@ -227,6 +227,8 @@
             window.location.href = currentData.Review_URL;
         } else if(serviceType === "P08_Resume") {
             window.location.href = currentData.Resume_Link;
+        } else if(serviceType === "P11_Challan") {
+            window.location.href = `https://echallan.parivahan.gov.in/index/accused-challan?vehicleNumber=${currentData.Vehicle_No || ''}`;
         } else if(serviceType === "P12_Invite" || serviceType === "P15_Static") {
             document.getElementById('pinProtectedView').classList.remove('hidden');
             document.getElementById('pinTitle').innerText = serviceType === "P12_Invite" ? "Event Invitation" : "Location Details";
@@ -275,25 +277,32 @@
             await fetch(`${SHEETDB_URL}?sheet=All_Alerts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [{
+                body: JSON.stringify({
                     Timestamp: new Date().toLocaleString(),
                     Cust_ID: customerId,
                     ScannerNo: phone,
                     Dikkat: dikkat,
                     Type: serviceType
-                }]})
+                })
             });
 
-            // Prepare Email
-            const subject = `🚨 10haath Security Alert: ${customerId}`;
-            const body = `Emergency Alert for your ${serviceType === 'P00_Human' ? 'Human' : 'Value'} Tag (${customerId}).\n\nProblem: ${dikkat}\nScanner Phone: ${phone}\n\nPlease check immediately.`;
-            const mailto = `mailto:${currentData.Email1}${currentData.Email2 ? ','+currentData.Email2 : ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            // Prepare Email - EXACT TEXT FROM NOTEPAD
+            const subject = encodeURIComponent("🚨 Gadi Alert: " + customerId);
+            const body = encodeURIComponent(
+                "Namaste,\n\nAapki gadi (" + customerId + ") ke saath ye dikkat hai:\n" + 
+                "👉 " + dikkat + "\n\n" +
+                "Main gadi ke paas khada hoon. Aap mujhe is number par contact kar sakte hain: " + phone + "\n\n" +
+                "- Sent via 10haath Smart QR System"
+            );
             
-            window.location.href = mailto;
+            const recipients = (currentData.Email1 || "") + (currentData.Email2 ? "," + currentData.Email2 : "");
+            window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+            
             btn.innerText = "Email App Opened!";
         } catch (err) {
             alert("Error sending alert: " + err.message);
             btn.disabled = false;
+            btn.innerText = "Submit & Send Email";
         }
     }
 
@@ -333,8 +342,8 @@
 
             if(!response.ok) throw new Error("Update failed");
 
-            // WhatsApp Redirect
-            const msg = `Help Needed! My Location: ${link1}`;
+            // WhatsApp Redirect - EXACT PREFILLED HELP MESSAGE
+            const msg = `Help Needed! 🚨\n\nOwner: ${currentData.Person_Name}\nVehicle: ${customerId}\n\nMy Location (Share Link): ${link1}\nSecondary Location: ${link2 || 'N/A'}\n\nPlease help me immediately.`;
             const targetPhone = currentData.Emergency1 || currentData.WACompany;
             window.location.href = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
         } catch (err) {

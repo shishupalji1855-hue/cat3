@@ -501,7 +501,7 @@
     const CATEGORIES = {
         1: { name: "Human Safety", tag: "Category 1", services: ["P00_Human"] },
         2: { name: "Value Safety", tag: "Category 2", services: ["P00_Value"] },
-        3: { name: "QR Services", tag: "Category 3", services: ["P01_Pay", "P03_Biz", "P04_Review", "P08_Resume", "P09_WiFi", "P12_Invite", "P15_Static"] },
+        3: { name: "QR Services", tag: "Category 3", services: ["P01_Pay", "P03_Biz", "P04_Review", "P08_Resume", "P09_WiFi", "P11_Challan", "P12_Invite", "P15_Static"] },
         4: { name: "Doc Vault", tag: "Category 4", services: ["P13_Doc"] }
     };
 
@@ -579,6 +579,17 @@
                 { id: "SSID", header: "SSID", label: "WiFi Name (SSID)", type: "text", ph: "Network Name", required: true },
                 { id: "Password", header: "Password", label: "WiFi Password", type: "text", ph: "Password", required: true },
                 { id: "Security", header: "Security", label: "Security Type", type: "text", ph: "WPA/WPA2", default: "WPA" }
+            ]
+        },
+        P11_Challan: {
+            label: "Vehicle Challan",
+            sheet: "P11_Challan",
+            fields: [
+                { id: "Cust_ID", header: "Cust_ID", label: "ID", type: "text", ph: "e.g. C101", required: true },
+                { id: "Name", header: "Name", label: "Owner Name", type: "text", ph: "Owner Name", required: true },
+                { id: "Vehicle_No", header: "Vehicle_No", label: "Vehicle Number", type: "text", ph: "MH12AB1234", required: true },
+                { id: "Engine_No", header: "Engine_No", label: "Engine Number", type: "text", ph: "Engine No" },
+                { id: "Chassis_No", header: "Chassis_No", label: "Chassis Number", type: "text", ph: "Chassis No" }
             ]
         },
         P12_Invite: {
@@ -697,7 +708,7 @@
 
     async function handleSubmit() {
         const svc = SERVICES[activeSvc];
-        const data = { Timestamp: new Date().toLocaleString() };
+        const payload = { Timestamp: new Date().toLocaleString() };
         let valid = true;
 
         svc.fields.forEach(f => {
@@ -706,7 +717,7 @@
                 valid = false;
                 document.getElementById(`f_${f.id}`).classList.add('border-red-500');
             } else {
-                data[f.header] = val; // Correct header mapping
+                payload[f.header] = val; // Exact header mapping from notepad
                 document.getElementById(`f_${f.id}`).classList.remove('border-red-500');
             }
         });
@@ -715,17 +726,31 @@
 
         setLoading(true);
         try {
-            // Save to SheetDB
-            const response = await fetch(`${SHEETDB_URL}?sheet=${activeSvc}`, {
+            // --- EXACT NOTEPAD POST LOGIC ---
+            const primaryUrl = `${SHEETDB_URL}/${activeSvc}`;
+            const altUrl = `${SHEETDB_URL}?sheet=${encodeURIComponent(activeSvc)}`;
+
+            let response = await fetch(primaryUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [data] })
+                body: JSON.stringify(payload) // Single object, no 'data' wrapper as per notepad
             });
 
-            if(!response.ok) throw new Error("SheetDB Save Failed");
+            if (!response.ok && response.status === 404) {
+                response = await fetch(altUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            if(!response.ok) {
+                const errText = await response.text();
+                throw new Error(`SheetDB Save Failed: ${errText}`);
+            }
 
             // Generate QR
-            generateQR(data);
+            generateQR(payload);
             showToast("QR Generated & Data Saved!", "success");
         } catch (err) {
             console.error(err);
@@ -740,15 +765,21 @@
         qrContainer.innerHTML = "";
         
         let qrData = "";
+        const svc = SERVICES[activeSvc];
+        
+        // Find ID column header
+        let idHeader = "Cust_ID";
+        if(["P00_Human", "P00_Value", "P15_Static"].includes(activeSvc)) {
+            idHeader = "Cust_ID(No.)";
+        }
+
         if(activeSvc === "P09_WiFi") {
-            // WiFi QR format: WIFI:S:SSID;T:WPA;P:PASSWORD;;
             qrData = `WIFI:S:${data.SSID};T:${data.Security || 'WPA'};P:${data.Password};;`;
             document.getElementById('qrLinkInfo').classList.add('hidden');
         } else {
-            // Encode important data for scanner
             const payload = {
                 t: activeSvc,
-                c: data.Cust_ID
+                c: data[idHeader]
             };
             const encoded = btoa(JSON.stringify(payload));
             qrData = `${SCANNER_URL}?s=${encoded}`;
@@ -766,7 +797,10 @@
             correctLevel: QRCode.CorrectLevel.H
         });
 
-        document.getElementById('qrFooter').innerText = data.Cust_ID || data.Person_Name || "";
+        // Sticker Footer logic from notepad (Person_Name or Gadi_Number or Name)
+        const footer = data.Person_Name || data.Gadi_Number || data.Name || data.Business_Name || data.Location_Name || data[idHeader] || "";
+        document.getElementById('qrFooter').innerText = footer;
+        
         document.getElementById('qrPlaceholder').style.display = "none";
         document.getElementById('qrCapture').style.display = "flex";
         document.getElementById('btnDownload').style.display = "block";
