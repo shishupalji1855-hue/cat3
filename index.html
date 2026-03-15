@@ -566,16 +566,16 @@
   <aside class="sidebar">
     <div class="sidebar-title">// Category</div>
     <button class="cat-btn" id="cat1" onclick="selectCategory(1)">
-      <span class="cat-num">C1</span> Standard Tags
+      <span class="cat-num">C1</span> Human Safety
     </button>
     <button class="cat-btn" id="cat2" onclick="selectCategory(2)">
-      <span class="cat-num">C2</span> Smart NFC
+      <span class="cat-num">C2</span> Value Safety
     </button>
     <button class="cat-btn active" id="cat3" onclick="selectCategory(3)">
       <span class="cat-num">C3</span> QR Services
     </button>
     <button class="cat-btn" id="cat4" onclick="selectCategory(4)">
-      <span class="cat-num">C4</span> Hybrid Combo
+      <span class="cat-num">C4</span> Doc Vault
     </button>
 
     <div id="serviceSection" style="margin-top:1.5rem;">
@@ -676,19 +676,20 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
 <script>
 // ============================================================
-// CONFIG — Exact tab names & column headers per spec
+// CONFIG — Loaded from config.js
 // ============================================================
-const SHEETDB_BASE = 'https://sheetdb.io/api/v1/vpozwh7cptzc4';
-const SCANNER_URL = "https://shishupalji1855-hue.github.io/10/scanner_tabs.html";
+const SHEETDB_BASE = CONFIG.SHEETDB_BASE;
+const SCANNER_URL = CONFIG.getScannerURL();
 
 // Each service: fields array ordered as per spec
-// type: '#' = QR+Sheet, '$' = Sheet only, '!' = auto
+// type: '#' = QR+Sheet, '$' = Sheet only, '!' = auto, '%' = scan filled
 const SERVICES = {
   P00_Human: {
     label: 'Human Safety',
-    tab:   'Registration', // Saves to main Registration tab
+    tab:   'Registration', 
     cat:   1,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
@@ -699,11 +700,13 @@ const SERVICES = {
       { header: 'Email2',     type: '#', short: 'e2',  label: 'Email 2',      ph: 'secondary@email.com', input: 'email', required: false },
       { header: 'WACompany',  type: '#', short: 'wa',  label: 'Company WA',   ph: '91XXXXXXXXXX', input: 'text'   },
       { header: 'Owner_PIN',  type: '#', short: 'k',   label: 'Owner PIN',    ph: '4-digit PIN',   input: 'password' },
+      { header: 'Dikkat',     type: '%', short: null,  label: 'Dikkat',       ph: 'Filled at scan', input: 'text' },
+      { header: 'ScannerNo',  type: '%', short: null,  label: 'Scanner No',   ph: 'Filled at scan', input: 'text' },
     ]
   },
   P00_Value: {
     label: 'Value Safety',
-    tab:   'Registration', // Saves to main Registration tab
+    tab:   'Registration',
     cat:   2,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
@@ -713,6 +716,8 @@ const SERVICES = {
       { header: 'Email2',     type: '#', short: 'e2',  label: 'Email 2',      ph: 'secondary@email.com', input: 'email', required: false },
       { header: 'WACompany',  type: '#', short: 'wa',  label: 'Company WA',   ph: '91XXXXXXXXXX', input: 'text'   },
       { header: 'Owner_PIN',  type: '#', short: 'k',   label: 'Owner PIN',    ph: '4-digit PIN',   input: 'password' },
+      { header: 'Dikkat',     type: '%', short: null,  label: 'Dikkat',       ph: 'Filled at scan', input: 'text' },
+      { header: 'ScannerNo',  type: '%', short: null,  label: 'Scanner No',   ph: 'Filled at scan', input: 'text' },
     ]
   },
   P01_Pay: {
@@ -789,7 +794,7 @@ const SERVICES = {
   },
   P13_Doc: {
     label: 'Doc Vault',
-    tab:   'Registration', // Saves to main Registration tab with I, J, K columns
+    tab:   'Registration', 
     cat:   4,
     fields: [
       { header: 'Timestamp',        type: '!', short: null },
@@ -838,14 +843,9 @@ function initServiceButtons(catNum = 3) {
 }
 
 function selectCategory(n) {
-  // Update active state on cat buttons
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('cat' + n).classList.add('active');
-  
-  // Update service grid
   initServiceButtons(n);
-  
-  // Show info if no service selected
   document.getElementById('mainTitle').textContent = 'Category ' + n;
   document.getElementById('mainDesc').textContent = 'Select a service type from the sidebar to begin building.';
   document.getElementById('formContainer').innerHTML = `
@@ -856,49 +856,30 @@ function selectCategory(n) {
   `;
 }
 
-// ============================================================
-// SELECT SERVICE — render form
-// ============================================================
 function selectService(key) {
   currentService = key;
   const svc = SERVICES[key];
-
-  // Update active state on buttons
   document.querySelectorAll('.svc-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('svc_' + key).classList.add('active');
-  // Find the dot inside the active button and style it
   document.getElementById('svc_' + key).querySelector('.svc-dot').style.background = 'var(--gold)';
-
   document.getElementById('mainTitle').textContent = svc.label;
-  document.getElementById('mainDesc').textContent =
-    'Tab: ' + svc.tab + ' | Fields: ' + svc.fields.filter(f => f.type !== '!').map(f => f.header).join(', ');
+  document.getElementById('mainDesc').textContent = 'Tab: ' + svc.tab;
   document.getElementById('sheetTarget').textContent = 'Sheet: ' + svc.tab;
-
   generateForm(key, svc);
 }
 
-// ============================================================
-// GENERATE FORM
-// ============================================================
 function generateForm(key, svc) {
   const userFields = svc.fields.filter(f => f.type === '#' || f.type === '$');
-
   let fieldsHTML = '';
-
-  // Pair up fields for two-column layout
   for (let i = 0; i < userFields.length; i += 2) {
     const f1 = userFields[i];
     const f2 = userFields[i + 1];
     if (f2) {
-      fieldsHTML += `<div class="field-row">
-        ${fieldHTML(f1)}
-        ${fieldHTML(f2)}
-      </div>`;
+      fieldsHTML += `<div class="field-row">${fieldHTML(f1)}${fieldHTML(f2)}</div>`;
     } else {
       fieldsHTML += `<div class="field-row full">${fieldHTML(f1)}</div>`;
     }
   }
-
   document.getElementById('formContainer').innerHTML = `
     <div class="form-card">
       <div class="form-card-header">
@@ -906,13 +887,9 @@ function generateForm(key, svc) {
         <div class="form-card-badge">${svc.label}</div>
       </div>
       <div class="form-body">
-        <!-- Auto timestamp display -->
         <div class="field-row full" style="margin-bottom:1rem;">
           <div class="field-group">
-            <label class="field-label">
-              <span class="field-symbol sym-auto">!</span>
-              Timestamp
-            </label>
+            <label class="field-label"><span class="field-symbol sym-auto">!</span>Timestamp</label>
             <div class="auto-field" id="tsDisplay">Auto-generated on submit</div>
           </div>
         </div>
@@ -924,11 +901,6 @@ function generateForm(key, svc) {
           </button>
           <button class="btn-reset" onclick="resetForm()">Clear</button>
         </div>
-        <div class="legend-strip">
-          <div class="legend-item"><span class="field-symbol sym-hash">#</span> QR + Sheet</div>
-          <div class="legend-item"><span class="field-symbol sym-dollar">$</span> Sheet only</div>
-          <div class="legend-item"><span class="field-symbol sym-auto">!</span> Auto</div>
-        </div>
       </div>
     </div>
   `;
@@ -936,121 +908,62 @@ function generateForm(key, svc) {
 
 function fieldHTML(f) {
   const isId = f.header === 'Cust_ID';
-  const sym = f.type === '#'
-    ? '<span class="field-symbol sym-hash">#</span>'
-    : '<span class="field-symbol sym-dollar">$</span>';
+  const sym = f.type === '#' ? '<span class="field-symbol sym-hash">#</span>' : '<span class="field-symbol sym-dollar">$</span>';
   return `
     <div class="field-group">
-      <label class="field-label" for="f_${f.header}">
-        ${sym} ${f.label}
-      </label>
-      <input
-        class="field-input ${isId ? 'id-field' : ''}"
-        id="f_${f.header}"
-        type="${f.input || 'text'}"
-        placeholder="${f.ph || ''}"
-        ${isId ? 'min="1"' : ''}
-        ${f.required === false ? '' : 'required'}
-      />
+      <label class="field-label" for="f_${f.header}">${sym} ${f.label}</label>
+      <input class="field-input ${isId ? 'id-field' : ''}" id="f_${f.header}" type="${f.input || 'text'}" placeholder="${f.ph || ''}" ${isId ? 'min="1"' : ''} ${f.required === false ? '' : 'required'} />
     </div>
   `;
 }
 
-// ============================================================
-// SUBMIT HANDLER
-// ============================================================
 async function handleSubmit() {
   if (!currentService) { showToast('Select a service first.', 'error'); return; }
   const svc = SERVICES[currentService];
-
-  // Collect values
   const values = {};
   const userFields = svc.fields.filter(f => f.type === '#' || f.type === '$');
   let valid = true;
-
   for (const f of userFields) {
     const el = document.getElementById('f_' + f.header);
     const val = el ? el.value.trim() : '';
-    const isRequired = f.required !== false;
-    if (isRequired && !val) {
-      el.style.borderColor = '#e74c3c';
-      valid = false;
-    } else {
-      el.style.borderColor = '';
-      values[f.header] = val;
-    }
+    if (f.required !== false && !val) { el.style.borderColor = '#e74c3c'; valid = false; }
+    else { el.style.borderColor = ''; values[f.header] = val; }
   }
-
   if (!valid) { showToast('Please fill all required fields.', 'error'); return; }
-
-  // Auto timestamp
   const ts = new Date().toLocaleString();
   values['Timestamp'] = ts;
   document.getElementById('tsDisplay').textContent = ts;
-
-  // Show spinner
   setBtnLoading(true);
-
-  // Build SheetDB payload — exact headers in spec order
   const rowData = {};
   svc.fields.forEach(f => {
     const col = f.sheetHeader || f.header;
-    if (f.type === '!') {
-      rowData[col] = ts;
-    } else if (f.type === '$') {
-      rowData[col] = values[f.header] || '';
-    } else if (f.type === '#') {
-      // For WiFi service, do not store # fields in sheet
-      if (currentService !== 'P09_WiFi') {
-        rowData[col] = values[f.header] || '';
-      }
-    }
+    if (f.type === '!') rowData[col] = ts;
+    else if (f.type === '$' || f.type === '#') rowData[col] = values[f.header] || '';
   });
-
-  const custId   = values['Cust_ID'];
-  let qrURL = null;
-
-  // Build short-key secret for QR
+  const custId = values['Cust_ID'];
   const secret = {};
   svc.fields.filter(f => f.type === '#' || f.header === 'Cust_ID').forEach(f => {
     secret[f.short] = values[f.header];
   });
   const sEncoded = btoa(JSON.stringify(secret));
-  // Keep QR payload compact: only send service type + encoded secret
-  qrURL = `${SCANNER_URL}?t=${currentService}&s=${sEncoded}`;
-
-  // Special case: P01_Pay uses exact link for QR
-  if (currentService === 'P01_Pay') {
-    qrURL = values['QR_Link_ID'] || qrURL;
-  }
-
-  // POST to SheetDB
+  let qrURL = `${SCANNER_URL}?t=${currentService}&s=${sEncoded}`;
+  if (currentService === 'P01_Pay') qrURL = values['QR_Link_ID'] || qrURL;
   try {
     const res = await fetch(`${SHEETDB_BASE}?sheet=${svc.tab}`, {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ data: [rowData] })
+      body: JSON.stringify({ data: [rowData] })
     });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error('SheetDB error: ' + errText);
-    }
-
+    if (!res.ok) throw new Error('SheetDB error');
     showToast('Saved to ' + svc.tab + ' successfully!', 'success');
     renderQR(qrURL, custId, currentService);
-
   } catch (err) {
     showToast('Sheet save failed: ' + err.message, 'error');
-    console.error(err);
   } finally {
     setBtnLoading(false);
   }
 }
 
-// ============================================================
-// QR GENERATION
-// ============================================================
 function renderQR(url, custId, serviceKey) {
   const qrBox = document.getElementById('qrBox');
   const qrDiv = document.getElementById('qrCode');
@@ -1058,29 +971,13 @@ function renderQR(url, custId, serviceKey) {
   const idDisplay = document.getElementById('qrIdDisplay');
   const urlPreview = document.getElementById('urlPreview');
   const btnDl = document.getElementById('btnDownload');
-
-  // Clear previous
   qrDiv.innerHTML = '';
-
-  // Generate
-  new QRCode(qrDiv, {
-    text:         url,
-    width:        256,
-    height:       256,
-    colorDark:    '#0a0a0f',
-    colorLight:   '#ffffff',
-    correctLevel: QRCode.CorrectLevel.L
-  });
-
+  new QRCode(qrDiv, { text: url, width: 256, height: 256, colorDark: '#0a0a0f', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.L });
   qrPlaceholder.style.display = 'none';
   qrBox.style.display = 'flex';
-
-  // Show Cust_ID clearly
   document.getElementById('qrIdValue').textContent = custId;
   document.getElementById('qrServiceTag').textContent = serviceKey + ' | ' + SERVICES[serviceKey].label;
   idDisplay.style.display = 'flex';
-
-  // Show URL preview and Download button (unless it's WiFi)
   if (serviceKey !== 'P09_WiFi') {
     document.getElementById('urlPreviewVal').textContent = url;
     urlPreview.style.display = 'flex';
@@ -1094,9 +991,7 @@ function renderQR(url, custId, serviceKey) {
 function copyQRLink() {
   const url = document.getElementById('urlPreviewVal').textContent;
   if (!url || url === '---') return;
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('QR Link copied to clipboard!', 'success');
-  });
+  navigator.clipboard.writeText(url).then(() => { showToast('QR Link copied!', 'success'); });
 }
 
 function downloadQR() {
@@ -1108,22 +1003,15 @@ function downloadQR() {
   link.click();
 }
 
-// ============================================================
-// HELPERS
-// ============================================================
 function resetForm() {
-  document.querySelectorAll('.field-input').forEach(el => {
-    el.value = '';
-    el.style.borderColor = '';
-  });
-  if (document.getElementById('tsDisplay'))
-    document.getElementById('tsDisplay').textContent = 'Auto-generated on submit';
+  document.querySelectorAll('.field-input').forEach(el => { el.value = ''; el.style.borderColor = ''; });
+  if (document.getElementById('tsDisplay')) document.getElementById('tsDisplay').textContent = 'Auto-generated on submit';
 }
 
 function setBtnLoading(state) {
   const btn = document.getElementById('btnSubmit');
   const txt = document.getElementById('btnText');
-  const sp  = document.getElementById('btnSpinner');
+  const sp = document.getElementById('btnSpinner');
   if (!btn) return;
   btn.disabled = state;
   txt.textContent = state ? 'Saving...' : 'Generate QR + Save';
@@ -1138,9 +1026,6 @@ function showToast(msg, type = 'info') {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// ============================================================
-// BOOT
-// ============================================================
 initServiceButtons();
 </script>
 </body>

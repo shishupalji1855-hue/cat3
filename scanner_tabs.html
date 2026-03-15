@@ -18,426 +18,66 @@
     --blue:    #2563eb;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Space Grotesk', sans-serif;
-    background: var(--ink);
-    color: var(--paper);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 600px 400px at 20% 50%, rgba(232,73,15,0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 500px 500px at 80% 20%, rgba(26,107,60,0.05) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .page {
-    width: 100%;
-    max-width: 480px;
-    padding: 1.5rem;
-    display: none;
-  }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--ink); color: var(--paper); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .page { width: 100%; max-width: 480px; padding: 1.5rem; display: none; }
   .page.active { display: block; }
-
-  /* Card base */
-  .card {
-    background: #13131e;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Card header */
-  .card-header {
-    padding: 1.5rem 1.75rem 1.25rem;
-    border-bottom: 1px solid #1e1e2e;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .card-logo {
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--paper);
-    opacity: 0.4;
-  }
+  .card { background: #13131e; border: 1px solid #222; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.5); animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .card-header { padding: 1.5rem 1.75rem 1.25rem; border-bottom: 1px solid #1e1e2e; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .card-logo { font-size: 0.85rem; font-weight: 700; letter-spacing: -0.02em; color: var(--paper); opacity: 0.4; }
   .card-logo span { color: var(--accent); }
-  .service-badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 2px;
-    border: 1px solid #333;
-    color: #888;
-    white-space: nowrap;
-  }
+  .service-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; border: 1px solid #333; color: #888; white-space: nowrap; }
   .card-body { padding: 1.75rem; }
-
-  /* Typography */
-  .heading-xl {
-    font-size: 1.65rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    color: var(--paper);
-    margin-bottom: 0.25rem;
-  }
-  .heading-sm {
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--paper);
-  }
-  .sub-text {
-    font-size: 0.82rem;
-    color: #666;
-    line-height: 1.5;
-    margin-top: 0.25rem;
-  }
+  .heading-xl { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; color: var(--paper); margin-bottom: 0.25rem; }
+  .heading-sm { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.02em; color: var(--paper); }
+  .sub-text { font-size: 0.82rem; color: #666; line-height: 1.5; margin-top: 0.25rem; }
   .mono { font-family: 'JetBrains Mono', monospace; }
-
-  /* Buttons */
-  .btn-primary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.95rem 1.5rem;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.18s ease;
-    letter-spacing: 0.01em;
-  }
+  .btn-primary { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.95rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.18s ease; letter-spacing: 0.01em; }
   .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
-
-  .btn-secondary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.85rem 1.5rem;
-    background: transparent;
-    color: var(--paper);
-    border: 1px solid #333;
-    border-radius: 6px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.15s;
-  }
+  .btn-secondary { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.85rem 1.5rem; background: transparent; color: var(--paper); border: 1px solid #333; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.15s; }
   .btn-secondary:hover { border-color: #555; background: #1a1a28; }
-
-  .btn-green {
-    background: var(--green);
-  }
-  .btn-blue {
-    background: var(--blue);
-  }
-
+  .btn-green { background: var(--green); }
   .btn-group { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 1.5rem; }
-
-  /* Data rows */
-  .data-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid #1a1a28;
-    gap: 1rem;
-  }
-  .data-row:last-child { border-bottom: none; }
-  .data-key {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #555;
-    min-width: 80px;
-    padding-top: 2px;
-  }
-  .data-val {
-    font-size: 0.88rem;
-    color: #ccc;
-    text-align: right;
-    word-break: break-all;
-    flex: 1;
-  }
-  .data-val.highlight {
-    color: var(--gold);
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Social links */
-  .social-links-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.75rem; }
-  .social-link-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.75rem;
-    background: #1a1a28;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    color: #7ba7ff;
-    text-decoration: none;
-    word-break: break-all;
-    cursor: pointer;
-    transition: background 0.15s;
-    border: none;
-    width: 100%;
-    text-align: left;
-  }
-  .social-link-item:hover { background: #22223a; }
-
-  /* PIN Input */
-  .pin-input-group {
-    display: flex;
-    gap: 0.6rem;
-    justify-content: center;
-    margin: 1.5rem 0;
-  }
-  .pin-digit {
-    width: 52px;
-    height: 60px;
-    background: #1a1a28;
-    border: 2px solid #333;
-    border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--paper);
-    text-align: center;
-    outline: none;
-    transition: border-color 0.15s;
-    caret-color: var(--accent);
-  }
+  .data-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.85rem 0; border-bottom: 1px solid #1a1a28; gap: 1rem; }
+  .data-key { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #555; min-width: 80px; padding-top: 2px; }
+  .data-val { font-size: 0.88rem; color: #ccc; text-align: right; word-break: break-all; flex: 1; }
+  .data-val.highlight { color: var(--gold); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .pin-input-group { display: flex; gap: 0.6rem; justify-content: center; margin: 1.5rem 0; }
+  .pin-digit { width: 52px; height: 60px; background: #1a1a28; border: 2px solid #333; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--paper); text-align: center; outline: none; transition: border-color 0.15s; caret-color: var(--accent); }
   .pin-digit:focus { border-color: var(--accent); }
-  .pin-digit.filled { border-color: #444; }
-  .pin-digit.error { border-color: #e74c3c; animation: shake 0.3s ease; }
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-  }
-
-  /* Redirect screen */
-  .redirect-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 2rem;
-    gap: 1rem;
-  }
-  .redirect-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(232,73,15,0.12);
-    margin-bottom: 0.5rem;
-  }
-  .redirect-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    color: #555;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .redirect-heading {
-    font-size: 1.3rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-  }
-  .loader-ring {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #222;
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .redirect-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 2rem; gap: 1rem; }
+  .loader-ring { width: 40px; height: 40px; border: 3px solid #222; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Wifi card special */
-  .wifi-ssid-display {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--gold);
-    padding: 1rem;
-    background: #0d0d18;
-    border-radius: 6px;
-    text-align: center;
-    margin: 1.25rem 0;
-    border: 1px solid #222;
-    letter-spacing: 0.05em;
-  }
-
-  /* Error */
-  .error-page {
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-  .error-code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--accent);
-    opacity: 0.4;
-  }
-  .error-title { font-size: 1.2rem; font-weight: 600; margin: 0.5rem 0; }
-  .error-desc { font-size: 0.82rem; color: #666; line-height: 1.6; }
-
-  /* Challan form */
-  .challan-field {
-    width: 100%;
-    padding: 0.65rem 0.85rem;
-    background: #1a1a28;
-    border: 1px solid #333;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: var(--paper);
-    margin-bottom: 0.75rem;
-    outline: none;
-  }
-  .challan-field:focus { border-color: #555; }
-  .challan-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #555;
-    margin-bottom: 0.3rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* Avatar initials */
-  .avatar-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent) 0%, #b83a0c 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  .divider {
-    height: 1px;
-    background: #1e1e2e;
-    margin: 1rem 0;
-  }
-
-  /* Doc / Static card */
-  .doc-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.85rem 1rem;
-    background: #1a1a28;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    border: 1px solid #222;
-  }
+  .challan-field { width: 100%; padding: 0.65rem 0.85rem; background: #1a1a28; border: 1px solid #333; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--paper); margin-bottom: 0.75rem; outline: none; }
+  .challan-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 0.3rem; font-family: 'JetBrains Mono', monospace; }
+  .avatar-circle { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, #b83a0c 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 0.75rem; }
+  .divider { height: 1px; background: #1e1e2e; margin: 1rem 0; }
+  .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; background: #1a1a28; border-radius: 6px; margin-bottom: 0.5rem; border: 1px solid #222; }
   .doc-item-label { font-size: 0.82rem; color: #aaa; }
-  .doc-item-link {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: #7ba7ff;
-    text-decoration: none;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-  }
-  .doc-item-link:hover { text-decoration: underline; }
-
-  /* Footer */
-  .card-footer {
-    padding: 0.85rem 1.75rem;
-    border-top: 1px solid #1a1a28;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .footer-brand {
-    font-size: 0.7rem;
-    color: #444;
-  }
+  .doc-item-link { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #7ba7ff; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0; }
+  .card-footer { padding: 0.85rem 1.75rem; border-top: 1px solid #1a1a28; display: flex; align-items: center; justify-content: space-between; }
+  .footer-brand { font-size: 0.7rem; color: #444; }
   .footer-brand span { color: var(--accent); }
-  .footer-type {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.62rem;
-    color: #444;
-  }
 </style>
 </head>
 <body>
 
-<!-- ===== LOADING ===== -->
 <div id="loadingScreen" class="redirect-screen">
   <div class="loader-ring"></div>
   <div class="redirect-text">Routing your request...</div>
 </div>
 
-<!-- ===== ERROR ===== -->
 <div id="errorPage" class="page">
   <div class="card">
-    <div class="card-body error-page">
-      <div class="error-code">404</div>
-      <div class="error-title">Unknown Service</div>
-      <div class="error-desc" id="errorDesc">This QR code doesn't match any known service type.<br/>Check the URL and try again.</div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">ERR</div>
+    <div class="card-body" style="text-align:center;">
+      <div class="heading-sm">Error</div>
+      <div class="sub-text" id="errorDesc">Unknown Service</div>
     </div>
   </div>
 </div>
 
-<!-- ===== ROLE_SELECT (Cat 1 & 2) ===== -->
+<!-- ROLE_SELECT (Cat 1 & 2) -->
 <div id="page_Role_Select" class="page">
   <div class="card">
     <div class="card-header">
@@ -446,1004 +86,135 @@
     </div>
     <div class="card-body" style="text-align:center;">
       <div class="heading-sm" id="role_name">---</div>
-      <div class="sub-text" style="margin-bottom:1.5rem;">Please select your role to proceed.</div>
-      
       <div class="btn-group">
-        <button class="btn-primary btn-green" onclick="switchToSavior()">
-          Savior
-          <span style="font-size:0.7rem;opacity:0.8;display:block;font-weight:400;">(I found this person/asset)</span>
-        </button>
-        <button class="btn-secondary" id="owner_role_btn" onclick="switchToOwner()">
-          Owner
-          <span style="font-size:0.7rem;opacity:0.6;display:block;font-weight:400;">(PIN Protected)</span>
-        </button>
+        <button class="btn-primary btn-green" onclick="switchToSavior()">Savior</button>
+        <button class="btn-secondary" id="owner_role_btn" onclick="switchToOwner()">Owner (PIN)</button>
       </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono" id="role_type_tag">P00</div>
     </div>
   </div>
 </div>
 
-<!-- ===== SAVIOR_STEP_1 (Verify via WA) ===== -->
+<!-- SAVIOR_FLOW -->
 <div id="page_Savior_Step1" class="page">
   <div class="card">
-    <div style="font-size: 3rem; margin-top: 1rem;">🚨</div>
-    <h2 style="color:#e63946; margin-top:0.5rem;">Gadi Alert System</h2>
-    <p class="sub-text">Gadi ke maalik ko emergency alert bhejne ke liye WhatsApp verify karein.</p>
-    
-    <a href="#" id="wa_verify_btn" target="_blank" class="btn-primary btn-green" style="margin-top: 1.5rem; text-decoration: none;" onclick="goToStep2()">
-       Verify via WhatsApp
-    </a>
-    <button class="btn-secondary" onclick="history.back()" style="margin-top:1rem;">Back</button>
+    <div class="card-body" style="text-align:center;">
+      <div style="font-size: 3rem;">🚨</div>
+      <div class="heading-sm">Gadi Alert</div>
+      <a href="#" id="wa_verify_btn" target="_blank" class="btn-primary btn-green" style="margin-top:1.5rem;" onclick="goToStep2()">Verify via WhatsApp</a>
+    </div>
   </div>
 </div>
 
-<!-- ===== SAVIOR_STEP_2 (Confirm Alert) ===== -->
 <div id="page_Savior_Step2" class="page">
   <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Confirm Alert</div>
-    </div>
+    <div class="card-header"><div class="service-badge">Confirm Alert</div></div>
     <div class="card-body">
-      <div class="challan-label">Vehicle Number (Verified)</div>
-      <input class="challan-field" id="savior_gadi_readonly" type="text" readonly style="background:#eee; color:#888;">
-
-      <div class="challan-label">Your Mobile Number</div>
-      <input class="challan-field" id="savior_phone" type="number" placeholder="WhatsApp Number jisse message bheja">
-
-      <div class="challan-label">Select/Write Problem</div>
-      <textarea class="challan-field" id="savior_reason" rows="3" placeholder="Gadi lock hai / Shisha khula hai / Emergency..."></textarea>
-
-      <div style="margin-top: 15px; padding: 12px; background: #fff4f4; border-radius: 10px; border: 1px solid #ffcccc; text-align: left;">
-        <p style="font-size: 11px; color: #d63031; margin: 0; line-height: 1.5; font-weight: 600;">
-          ⚠️ <span style="text-decoration: underline;">Sachet (Alert):</span> Aapka WhatsApp number verification ke liye hamare server par record kiya ja chuka hai. 
-          <br><br>
-          Kisi dusre ki gadi ke saath shararat karna ya galat jankari dena kanoonan apradh hai.
-        </p>
-      </div>
-
-      <button class="btn-primary" id="savior_submitBtn" onclick="submitSaviorAlertExact()" style="margin-top:1.5rem;">Final Submit</button>
-      <button class="btn-secondary" onclick="history.back()" style="margin-top:0.5rem;">Cancel</button>
+      <div class="challan-label">Gadi Number</div>
+      <input class="challan-field" id="savior_gadi_readonly" type="text" readonly>
+      <div class="challan-label">Your WhatsApp No</div>
+      <input class="challan-field" id="savior_phone" type="number">
+      <div class="challan-label">Problem</div>
+      <textarea class="challan-field" id="savior_reason" rows="3"></textarea>
+      <button class="btn-primary" id="savior_submitBtn" onclick="submitSaviorAlertExact()">Final Submit</button>
     </div>
   </div>
 </div>
 
-<!-- ===== OWNER_SOS_DASHBOARD (Cat 1 & 2) ===== -->
-<div id="page_Owner_SOS" class="page">
-  <div class="card" style="max-width: 500px;">
-    <div class="tabs" style="display:flex; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
-      <div class="tab" style="flex:1; padding:12px; background:#eee; color:#666; font-weight:bold; cursor:pointer;" onclick="switchToSavior()">Savior</div>
-      <div class="tab active" style="flex:1; padding:12px; background:var(--dark); color:white; font-weight:bold; cursor:pointer;">Owner</div>
-    </div>
-
-    <div id="owner_lock_view">
-      <h2 style="text-align:left; font-size: 1.8rem; margin-bottom:1rem;">Step 2: Owner SOS</h2>
-      <div class="challan-label">SECURITY PIN</div>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <input class="challan-field" id="owner_sos_pin" type="password" placeholder="****" style="flex:1;">
-        <button class="btn-primary btn-green" onclick="unlockOwnerSOS()" style="width:auto; padding: 10px 20px; margin:0;">Unlock SOS</button>
-      </div>
-      <div id="owner_pin_err" style="color:red; font-size:0.8rem; margin-top:5px;"></div>
-    </div>
-
-    <div id="owner_sos_view" style="display:none;">
-      <h2 style="text-align:left; font-size: 1.8rem; margin-bottom:1rem;">Step 2: Owner SOS</h2>
-      
-      <button class="btn-primary btn-green" style="margin-bottom:1.5rem;" onclick="window.open('https://www.google.com/maps', '_blank')">
-        OPEN GOOGLE MAPS (LIVE SHARE)
-      </button>
-
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:left;">
-        <div>
-          <label class="challan-label" style="font-size: 0.7rem;">LIVE LOCATION LINK</label>
-          <input class="challan-field" id="owner_loc_link" type="text" placeholder="">
-        </div>
-        <div>
-          <label class="challan-label" style="font-size: 0.7rem;">CONFIRM LINK (PASTE HERE)</label>
-          <input class="challan-field" id="owner_loc_confirm" type="text" placeholder="Paste Google live location link">
-        </div>
-      </div>
-
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:1.5rem;">
-        <button class="btn-primary" style="background:#d9822b; margin:0;" onclick="copyOwnerLink()">COPY LINK</button>
-        <button class="btn-primary" style="background:#e63946; margin:0;" onclick="confirmAndSaveOwnerSOS()">CONFIRM & SAVE</button>
-      </div>
-
-      <p class="sub-text" style="text-align:left; font-size:0.75rem; margin-top:1rem;">
-        Tip: Google Maps khul gaya hai. Wahan <b>Share live location</b> link copy karke yahan paste karein.
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- ===== SAVIOR_FORM (Universal for Cat 1 & 2) ===== -->
-<div id="page_Savior_Form" class="page">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Savior Alert</div>
-    </div>
-    <div class="card-body">
-      <!-- Step 1: WA Alert Button -->
-      <div id="savior_verify_view" style="text-align:center;">
-        <div style="font-size: 3rem;margin-bottom:1rem;">🚨</div>
-        <div class="heading-sm">Emergency Alert</div>
-        <p class="sub-text" style="margin-bottom:1.5rem;">
-          Gadi ke maalik ko emergency alert bhejne ke liye niche diye gaye button par click karein.
-        </p>
-        <button class="btn-primary btn-green" onclick="startSaviorForm()">
-          SEND WHATSAPP ALERT
-        </button>
-      </div>
-
-      <!-- Step 2: Form -->
-      <div id="savior_form_content" style="display:none;">
-        <div class="heading-sm">Report a Problem</div>
-        <div class="sub-text" style="margin-bottom:1rem;">Help the owner by reporting the issue.</div>
-        
-        <div class="challan-label">Your WhatsApp Number</div>
-        <input class="challan-field" id="savior_phone" type="number" placeholder="91XXXXXXXXXX"/>
-        
-        <div class="challan-label">Describe the Issue</div>
-        <textarea class="challan-field" id="savior_reason" rows="3" placeholder="e.g. Gadi lock hai / Shisha khula hai..."></textarea>
-        
-        <div style="margin: 1rem 0; padding: 0.75rem; background: rgba(230,57,70,0.1); border-radius: 8px; border: 1px solid rgba(230,57,70,0.2);">
-          <p style="font-size: 0.65rem; color: #ff6b6b; line-height: 1.4;">
-            ⚠️ Aapka number verification ke liye record kiya jayega. Galat jankari dena kanoonan apradh hai.
-          </p>
-        </div>
-        
-        <button class="btn-primary" id="savior_submitBtn" onclick="submitSaviorAlert()">Final Submit</button>
-      </div>
-
-      <button class="btn-secondary" onclick="history.back()" style="margin-top:0.5rem;">Cancel</button>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">SAVIOR</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P13_DOC ===== -->
+<!-- P13_DOC -->
 <div id="page_P13_Doc" class="page">
   <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Security Vault</div>
-    </div>
+    <div class="card-header"><div class="service-badge">Security Vault</div></div>
     <div class="card-body" style="text-align:center;">
       <div class="heading-sm" id="p13_name">---</div>
-      <div class="sub-text" id="p13_gadi">Vehicle: ---</div>
-      <div class="divider"></div>
-      
       <div id="p13_timer_view">
-        <p class="sub-text">Documents access valid for 20 minutes.</p>
-        <div class="heading-xl" id="p13_timer" style="color:var(--accent);margin:1rem 0;">20:00</div>
-        <button class="btn-primary" id="p13_accessBtn" onclick="requestDocAccess()">
-          REQUEST ACCESS & VIEW
-        </button>
+        <div class="heading-xl" id="p13_timer">20:00</div>
+        <button class="btn-primary" onclick="requestDocAccess()">REQUEST ACCESS</button>
       </div>
-
       <div id="p13_folder_view" style="display:none;">
-        <div class="doc-item">
-          <span class="doc-item-label">Document Folder</span>
-          <a class="doc-item-link" id="p13_folderLink" href="#" target="_blank">Open Folder</a>
-        </div>
-        <div class="divider"></div>
-        <div class="challan-label">Enter PDF Password (from owner)</div>
-        <input class="challan-field" id="p13_pdf_pass" type="text" placeholder="Password..."/>
-        <p class="sub-text" style="font-size:0.7rem;margin-top:0.5rem;">
-          Once you open the folder, click on the PDF and enter the password above if prompted.
-        </p>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P13_DOC</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P01_PAY (redirecting...) ===== -->
-<div id="page_P01_Pay" class="page">
-  <div class="redirect-screen" style="min-height:auto;padding:0;">
-    <div class="card" style="width:100%;text-align:center;">
-      <div class="card-body" style="padding:2.5rem 1.75rem;">
-        <div class="loader-ring" style="margin:0 auto 1.25rem;"></div>
-        <div class="heading-sm" id="p01_name">Loading...</div>
-        <div class="sub-text" style="margin-top:0.3rem;">Redirecting to payment link...</div>
-        <div class="divider"></div>
-        <a class="btn-primary btn-green" id="p01_manualBtn" href="#" style="margin-top:0.5rem;">
-          Open Link Manually
-        </a>
-      </div>
-      <div class="card-footer">
-        <div class="footer-brand">10<span>haath</span></div>
-        <div class="footer-type mono">P01_PAY</div>
+        <div class="doc-item"><span class="doc-item-label">Folder</span><a class="doc-item-link" id="p13_folderLink" href="#" target="_blank">Open</a></div>
+        <input class="challan-field" id="p13_pdf_pass" type="text" placeholder="PDF Password...">
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== P03_BIZ ===== -->
-<div id="page_P03_Biz" class="page">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Business Card</div>
-    </div>
-    <div class="card-body">
-      <div style="display:flex;align-items:center;gap:1.1rem;margin-bottom:1.25rem;">
-        <div class="avatar-circle" id="p03_avatar">?</div>
-        <div>
-          <div class="heading-xl" id="p03_name">---</div>
-          <div class="sub-text" id="p03_job">---</div>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div id="p03_phone_row" class="data-row">
-        <div class="data-key">Phone</div>
-        <div class="data-val" id="p03_phone">---</div>
-      </div>
-      <div id="p03_social_section" style="margin-top:1rem;">
-        <div class="data-key" style="margin-bottom:0.5rem;">Social / Links</div>
-        <div class="social-links-list" id="p03_socialList"></div>
-      </div>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="saveContact()">Save Contact (VCF)</button>
-        <a class="btn-secondary" id="p03_callBtn" href="#">Call Now</a>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P03_BIZ</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P04_REVIEW (redirect) ===== -->
-<div id="page_P04_Review" class="page">
-  <div class="card">
-    <div class="card-body" style="padding:2rem 1.75rem;text-align:center;">
-      <div class="loader-ring" style="margin:0 auto 1.25rem;"></div>
-      <div class="heading-sm" id="p04_name">---</div>
-      <div class="sub-text">Opening Google Review page...</div>
-      <a class="btn-primary" id="p04_manualBtn" href="#" style="margin-top:1.5rem;">
-        Open Review Page
-      </a>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P04_REVIEW</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P08_RESUME (redirect) ===== -->
-<div id="page_P08_Resume" class="page">
-  <div class="card">
-    <div class="card-body" style="padding:2rem 1.75rem;text-align:center;">
-      <div class="loader-ring" style="margin:0 auto 1.25rem;"></div>
-      <div class="heading-sm" id="p08_name">---</div>
-      <div class="sub-text">Opening Resume / CV...</div>
-      <a class="btn-primary" id="p08_manualBtn" href="#" style="margin-top:1.5rem;">
-        View Resume
-      </a>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P08_RESUME</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P09_WIFI ===== -->
-<div id="page_P09_WiFi" class="page">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">WiFi Connect</div>
-    </div>
-    <div class="card-body">
-      <div class="sub-text" style="margin-bottom:0.5rem;">Network Name</div>
-      <div class="wifi-ssid-display" id="p09_ssid">---</div>
-      <div class="data-row">
-        <div class="data-key">Password</div>
-        <div class="data-val" id="p09_pass" style="cursor:pointer;" title="Tap to copy">---</div>
-      </div>
-      <div class="btn-group">
-        <a class="btn-primary btn-green" id="p09_connectBtn" href="#">
-          Connect to WiFi
-        </a>
-        <button class="btn-secondary" onclick="copyPassword()">Copy Password</button>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P09_WIFI</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P12_INVITE ===== -->
-<div id="page_P12_Invite" class="page">
-  <!-- PIN Entry -->
-  <div id="p12_pinView" class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Private Invite</div>
-    </div>
-    <div class="card-body" style="text-align:center;">
-      <div class="heading-sm">Enter PIN</div>
-      <div class="sub-text" style="margin-bottom:0.5rem;">This invite is PIN-protected.</div>
-      <div class="pin-input-group">
-        <input class="pin-digit" maxlength="1" id="pin0" oninput="pinNext(0)" onkeydown="pinBack(event,0)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)" inputmode="numeric"/>
-      </div>
-      <div id="p12_pinError" style="font-size:0.78rem;color:#e74c3c;min-height:1.2rem;"></div>
-      <button class="btn-primary" onclick="verifyPin()" style="margin-top:0.75rem;">Verify PIN</button>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P12_INVITE</div>
-    </div>
-  </div>
-
-  <!-- Invite Details (shown after correct PIN) -->
-  <div id="p12_detailView" class="card" style="display:none;margin-top:1rem;">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">You Are Invited</div>
-    </div>
-    <div class="card-body">
-      <div class="heading-xl" id="p12_eventName" style="color:var(--gold);">---</div>
-      <div class="sub-text" id="p12_hostName" style="margin-bottom:1rem;">---</div>
-      <div class="data-row">
-        <div class="data-key">Date</div>
-        <div class="data-val highlight" id="p12_date">---</div>
-      </div>
-      <div class="btn-group">
-        <a class="btn-primary btn-green" id="p12_mapsBtn" href="#" target="_blank" rel="noopener">
-          Open in Maps
-        </a>
-        <a class="btn-secondary" id="p12_videoBtn" href="#" target="_blank" rel="noopener">
-          Watch Invitation Video
-        </a>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P12_INVITE</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== P15_STATIC ===== -->
-<div id="page_P15_Static" class="page">
-  <!-- PIN Entry -->
-  <div id="p15_pinView" class="card">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Static Location</div>
-    </div>
-    <div class="card-body" style="text-align:center;">
-      <div class="heading-sm">Enter PIN</div>
-      <div class="sub-text" style="margin-bottom:0.5rem;">This location is PIN-protected.</div>
-      <div class="pin-input-group">
-        <input class="pin-digit" maxlength="1" id="p15_pin0" oninput="pinNext15(0)" onkeydown="pinBack15(event,0)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="p15_pin1" oninput="pinNext15(1)" onkeydown="pinBack15(event,1)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="p15_pin2" oninput="pinNext15(2)" onkeydown="pinBack15(event,2)" inputmode="numeric"/>
-        <input class="pin-digit" maxlength="1" id="p15_pin3" oninput="pinNext15(3)" onkeydown="pinBack15(event,3)" inputmode="numeric"/>
-      </div>
-      <div id="p15_pinError" style="font-size:0.78rem;color:#e74c3c;min-height:1.2rem;"></div>
-      <button class="btn-primary" onclick="verifyPin15()" style="margin-top:0.75rem;">Verify PIN</button>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P15_STATIC</div>
-    </div>
-  </div>
-
-  <!-- Location Details (shown after correct PIN) -->
-  <div id="p15_detailView" class="card" style="display:none;margin-top:1rem;">
-    <div class="card-header">
-      <div class="card-logo">10<span>haath</span></div>
-      <div class="service-badge">Location Details</div>
-    </div>
-    <div class="card-body">
-      <div class="heading-xl" id="p15_locationName" style="color:var(--gold);">---</div>
-      <div class="sub-text" id="p15_address" style="margin-bottom:1rem;">---</div>
-      <div class="btn-group">
-        <a class="btn-primary btn-green" id="p15_mapsBtn" href="#" target="_blank" rel="noopener">
-          Open in Maps
-        </a>
-        <a class="btn-secondary" id="p15_videoBtn" href="#" target="_blank" rel="noopener">
-          Watch Location Video
-        </a>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="footer-brand">10<span>haath</span></div>
-      <div class="footer-type mono">P15_STATIC</div>
-    </div>
-  </div>
-</div>
-
+<script src="config.js"></script>
 <script>
-// ============================================================
-// SHORT KEY MAP — 1-letter back to functional variable
-// ============================================================
-// P00_Human:  n=Name, e=Emergency, e1=Email1, e2=Email2, wa=WACompany, k=PIN
-// P00_Value:  n=Name, e1=Email1, e2=Email2, wa=WACompany
-// P01_Pay:     n=Name, u=UPI_ID
-// P03_Biz:     n=Name, j=Job, p=Phone, s=Social_Links
-// P04_Review:  n=Name, r=Review_URL
-// P08_Resume:  n=Name, d=Drive_URL
-// P09_WiFi:    n=Name, s=SSID, p=Password
-// P12_Invite:  n=Name, k=PIN, ev=Event_Name, dt=Date, m=Maps_Link, vl=Video_Link
-// P13_Doc:     n=Name, v=Gadi, dl=Drive_Link, dp=Drive_Pass, fp=Free_PDF
-// P15_Static:  k=PIN, loc=Name of location, wa=Written Address, m=Maps_Link, vl=Video_Link
+const SHEETDB_BASE = CONFIG.SHEETDB_BASE;
+const COMPANY_WA = CONFIG.COMPANY_WA;
+const SCANNER_URL = CONFIG.getScannerURL();
 
-// ============================================================
-// ROUTER — parse URL and dispatch
-// ============================================================
 function getParams() {
   const p = new URLSearchParams(window.location.search);
   const t = p.get('t') || '';
-  const n = decodeURIComponent(p.get('n') || '');
-  const id = p.get('id') || '';
   const sRaw = p.get('s') || '';
   let secret = {};
-  if (sRaw) {
-    try { secret = JSON.parse(atob(sRaw)); }
-    catch (e) { secret = {}; }
-  }
-  return { t, n, id, secret };
+  if (sRaw) try { secret = JSON.parse(atob(sRaw)); } catch (e) {}
+  return { t, secret };
 }
 
 function showPage(id) {
   document.getElementById('loadingScreen').style.display = 'none';
-  const allPages = document.querySelectorAll('.page');
-  allPages.forEach(p => p.classList.remove('active'));
-  const target = document.getElementById(id);
-  if (target) target.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function showError(msg) {
-  document.getElementById('errorDesc').textContent = msg || 'Unknown error.';
-  showPage('errorPage');
-}
-
-// ============================================================
-// ROUTE DISPATCH
-// ============================================================
 function route() {
-  const { t, n, id, secret } = getParams();
-
-  if (!t) { showError('No service type (t) in URL.'); return; }
-
-  const dispatcher = {
-    'P00_Human':   () => routeHuman(secret, n),
-    'P00_Value':   () => routeValue(secret, n),
-    'P01_Pay':     () => routePay(secret, n),
-    'P03_Biz':     () => routeBiz(secret, n),
-    'P04_Review':  () => routeReview(secret, n),
-    'P08_Resume':  () => routeResume(secret, n),
-    'P09_WiFi':    () => routeWifi(secret, n),
-    'P12_Invite':  () => routeInvite(secret, n),
-    'P13_Doc':     () => routeDoc(secret, n),
-    'P15_Static':  () => routeStatic(secret, n),
-  };
-
-  if (dispatcher[t]) {
-    dispatcher[t]();
+  const { t, secret } = getParams();
+  if (!t) return;
+  if (t === 'P00_Human' || t === 'P00_Value') {
+    document.getElementById('role_name').textContent = secret.n || 'User';
+    document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${secret.n}`;
+    showPage('page_Role_Select');
+  } else if (t === 'P13_Doc') {
+    document.getElementById('p13_name').textContent = secret.n || 'User';
+    showPage('page_P13_Doc');
   } else {
-    showError('Service type "' + t + '" is not recognized.');
+    // Other Category 3 routes would go here (redirects etc)
+    window.location.href = secret.u || secret.d || secret.r || '#';
   }
 }
 
-const SHEETDB_BASE = 'https://sheetdb.io/api/v1/vpozwh7cptzc4';
-const COMPANY_WA = '919718531983';
-
-// ============================================================
-// P00_HUMAN — Human Safety
-// ============================================================
-let _humanSecret = {};
-function routeHuman(s, n) {
-  _humanSecret = s;
-  const name = s.n || n || 'Unknown';
-  document.getElementById('role_name').textContent = name;
-  document.getElementById('role_service_label').textContent = 'Human Safety';
-  document.getElementById('role_type_tag').textContent = 'P00_HUMAN';
-  document.getElementById('owner_role_btn').style.display = 'block'; // Show owner tab for Cat 1
-  showPage('page_Role_Select');
-}
-
-// ============================================================
-// P00_VALUE — Value Safety
-// ============================================================
-let _valueSecret = {};
-function routeValue(s, n) {
-  _valueSecret = s;
-  const name = s.n || n || 'Valuable Asset';
-  document.getElementById('role_name').textContent = name;
-  document.getElementById('role_service_label').textContent = 'Value Safety';
-  document.getElementById('role_type_tag').textContent = 'P00_VALUE';
-  document.getElementById('owner_role_btn').style.display = 'none'; // Hide owner tab for Cat 2 as per spec
-  showPage('page_Role_Select');
-}
-
-// ============================================================
-// SAVIOR WORKFLOW (Cat 1 & 2)
-// ============================================================
-function goToStep2() {
-  setTimeout(function() {
-    const t = getParams().t;
-    const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
-    const gadi = s.n || getParams().n || 'N/A';
-    document.getElementById('savior_gadi_readonly').value = gadi;
-    showPage('page_Savior_Step2');
-  }, 1500);
+function switchToSavior() { showPage('page_Savior_Step1'); }
+function goToStep2() { 
+  const { secret } = getParams();
+  document.getElementById('savior_gadi_readonly').value = secret.n || 'N/A';
+  setTimeout(() => showPage('page_Savior_Step2'), 1500); 
 }
 
 async function submitSaviorAlertExact() {
-  const phone = document.getElementById('savior_phone').value.trim();
-  const reason = document.getElementById('savior_reason').value.trim();
-  const t = getParams().t;
-  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
-  const gadi = s.n || getParams().n || 'N/A';
-
-  if(phone.length < 10) { alert("Kripya sahi WhatsApp number bharein!"); return; }
-  if(!reason) { alert("Dikkat batayein!"); return; }
-  
-  const btn = document.getElementById('savior_submitBtn');
-  btn.innerText = "Processing..."; 
-  btn.disabled = true;
-
-  // 1. Save to Sheet
+  const phone = document.getElementById('savior_phone').value;
+  const reason = document.getElementById('savior_reason').value;
+  const gadi = document.getElementById('savior_gadi_readonly').value;
+  const { t, secret } = getParams();
+  const payload = {
+    "Timestamp": new Date().toLocaleString(),
+    "Cust_ID(No.)": secret.c || '',
+    "Person_Name": gadi,
+    "Dikkat": reason,
+    "ScannerNo": phone
+  };
   try {
-    await fetch(SHEETDB_BASE + '?sheet=All_Alerts', {
+    await fetch(`${SHEETDB_BASE}?sheet=Registration`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: [{
-        Timestamp: new Date().toLocaleString(),
-        Asset_Name: gadi,
-        Scanner_Phone: phone,
-        Reason: reason,
-        Service: t,
-        Status: "VERIFIED"
-      }]})
+      body: JSON.stringify({ data: [payload] })
     });
-  } catch(e) { console.error('Sheet save failed', e); }
-
-  // 2. Open Mailto
-  const recipients = [s.e1, s.e2].filter(Boolean).join(',');
-  const subject = encodeURIComponent("🚨 Gadi Alert: " + gadi);
-  const body = encodeURIComponent(
-    "Namaste,\n\nAapki gadi (" + gadi + ") ke saath ye dikkat hai:\n" + 
-    "👉 " + reason + "\n\n" +
-    "Main gadi ke paas khada hoon. Aap mujhe is number par contact kar sakte hain: " + phone + "\n\n" +
-    "- Sent via Smart QR System"
-  );
-  
-  window.location.href = "mailto:" + recipients + "?subject=" + subject + "&body=" + body;
-  btn.innerText = "Email App Opened!";
+    const recipients = [secret.e1, secret.e2].filter(e => e).join(',');
+    window.location.href = `mailto:${recipients}?subject=Alert%20${gadi}&body=${reason}%20Call:${phone}`;
+  } catch (err) { alert(err.message); }
 }
 
-// ============================================================
-// ROLE SWITCHING
-// ============================================================
-function switchToSavior() {
-  const t = getParams().t;
-  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
-  const gadi = s.n || getParams().n || 'Unknown';
-  const targetWA = s.wa || COMPANY_WA;
-  document.getElementById('wa_verify_btn').href = `https://wa.me/${targetWA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
-  showPage('page_Savior_Step1');
+function requestDocAccess() {
+  const { secret } = getParams();
+  document.getElementById('p13_folderLink').href = secret.dl || '#';
+  document.getElementById('p13_pdf_pass').value = secret.dp || '';
+  document.getElementById('p13_timer_view').style.display = 'none';
+  document.getElementById('p13_folder_view').style.display = 'block';
+  // Timer logic here
 }
 
-function switchToOwner() {
-  showPage('page_Owner_SOS');
-  document.getElementById('owner_lock_view').style.display = 'block';
-  document.getElementById('owner_sos_view').style.display = 'none';
-  document.getElementById('owner_sos_pin').value = '';
-  document.getElementById('owner_pin_err').textContent = '';
-}
-
-// ============================================================
-// OWNER SOS WORKFLOW
-// ============================================================
-function unlockOwnerSOS() {
-  const pin = document.getElementById('owner_sos_pin').value;
-  const t = getParams().t;
-  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
-  const correct = String(s.k || '');
-
-  if (pin === correct) {
-    document.getElementById('owner_lock_view').style.display = 'none';
-    document.getElementById('owner_sos_view').style.display = 'block';
-  } else {
-    document.getElementById('owner_pin_err').textContent = 'Incorrect PIN.';
-  }
-}
-
-function copyOwnerLink() {
-  const link = document.getElementById('owner_loc_link').value;
-  if (!link) return alert("Pehle link paste karein!");
-  navigator.clipboard.writeText(link).then(() => {
-    alert("Link copied!");
-  });
-}
-
-async function confirmAndSaveOwnerSOS() {
-  const link = document.getElementById('owner_loc_link').value.trim();
-  const confirm = document.getElementById('owner_loc_confirm').value.trim();
-  const t = getParams().t;
-  const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
-
-  if (!link || link !== confirm) {
-    alert("Links match nahi kar rahe ya khali hain!");
-    return;
-  }
-
-  // 1. Save to Live_Status sheet
-  try {
-    const res = await fetch(SHEETDB_BASE + '?sheet=Live_Status', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: [{
-        Timestamp: new Date().toLocaleString(),
-        'Cust_ID(No.)': s.c,
-        Name: s.n,
-        Location_Link: link,
-        Service: t
-      }]})
-    });
-    if (!res.ok) throw new Error('Sheet save failed');
-    alert("Live location saved successfully!");
-  } catch(e) { 
-    console.error('Status update failed', e); 
-    alert("Sheet save failed. Check console.");
-  }
-
-  // 2. Redirect to WA Emergency
-  const msg = encodeURIComponent(`HELP! I am at this location: ${link}\n- Sent via 10haath Owner SOS`);
-  window.location.href = `https://wa.me/${s.e}?text=${msg}`;
-}
-
-// ============================================================
-// P13_DOC — Security Vault (20 min timer)
-// ============================================================
-let _p13Timer = null;
-let _p13Secret = {};
-
-function routeDoc(s, n) {
-  _p13Secret = s;
-  document.getElementById('p13_name').textContent = s.n || n || 'Doc Vault';
-  document.getElementById('p13_gadi').textContent = 'Vehicle: ' + (s.v || '---');
-  
-  // Important: viewBtn href is the decoded link
-  document.getElementById('p13_accessBtn').onclick = function() {
-    startP13Timer(1200);
-    window.open(s.dl, '_blank');
-    // Show password folder view after click
-    document.getElementById('p13_timer_view').style.display = 'none';
-    document.getElementById('p13_folder_view').style.display = 'block';
-    document.getElementById('p13_folderLink').href = s.dl;
-  };
-  
-  showPage('page_P13_Doc');
-}
-
-function startP13Timer(sec) {
-  if (_p13Timer) clearInterval(_p13Timer);
-  _p13Timer = setInterval(() => {
-    sec--;
-    let mins = Math.floor(sec / 60);
-    let rem = sec % 60;
-    document.getElementById('p13_timer').textContent = `${mins}:${rem < 10 ? '0' : ''}${rem}`;
-    if (sec <= 0) {
-      clearInterval(_p13Timer);
-      document.body.innerHTML = "<h1>Link Expired!</h1>";
-    }
-  }, 1000);
-}
-
-// ============================================================
-// P01_PAY — UPI redirect
-// ============================================================
-function routePay(s, n) {
-  const name  = s.n || n || 'Payee';
-  const qrLink = s.u || '';
-  showPage('page_P01_Pay');
-  document.getElementById('p01_name').textContent = 'Pay: ' + name;
-
-  if (!qrLink) {
-    document.getElementById('p01_manualBtn').textContent = 'QR Link not found';
-    return;
-  }
-  
-  document.getElementById('p01_manualBtn').href = qrLink;
-  // Auto-redirect after short delay
-  setTimeout(() => { window.location.href = qrLink; }, 150);
-}
-
-// ============================================================
-// P03_BIZ — Business Card
-// ============================================================
-let _bizData = {};
-function routeBiz(s, n) {
-  const name   = s.n || n || 'Unknown';
-  const job    = s.j || '';
-  const phone  = s.p || '';
-  const social = s.s || '';
-
-  // Store the computed name and other data for VCF
-  _bizData = { n: name, j: job, p: phone, s: social };
-
-  document.getElementById('p03_name').textContent  = name;
-  document.getElementById('p03_job').textContent   = job;
-  document.getElementById('p03_phone').textContent = phone;
-  document.getElementById('p03_avatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('p03_callBtn').href = 'tel:' + phone;
-
-  // Parse social links (comma or newline separated)
-  const list = document.getElementById('p03_socialList');
-  list.innerHTML = '';
-  if (social) {
-    const links = social.split(/[,\n]+/).map(l => l.trim()).filter(Boolean);
-    links.forEach(link => {
-      const a = document.createElement('a');
-      a.className = 'social-link-item';
-      a.textContent = link;
-      a.href = link.startsWith('http') ? link : 'https://' + link;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      list.appendChild(a);
-    });
-  }
-  showPage('page_P03_Biz');
-}
-
-function saveContact() {
-  const s = _bizData;
-  const name  = s.n || 'Contact';
-  const phone = s.p || '';
-  const job   = s.j || '';
-  const vcf = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    'FN:' + name,
-    'N:;' + name + ';;;',
-    'TEL;TYPE=CELL:' + phone,
-    'TITLE:' + job,
-    'END:VCARD'
-  ].join('\r\n') + '\r\n';
-
-  const blob = new Blob([vcf], { type: 'text/vcard' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.style.display = 'none';
-  a.href     = url;
-  a.download = name.replace(/\s/g, '_') + '.vcf';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// ============================================================
-// P04_REVIEW — redirect
-// ============================================================
-function routeReview(s, n) {
-  const name = s.n || n || 'Review';
-  const url  = s.r || '';
-  document.getElementById('p04_name').textContent = name;
-  document.getElementById('p04_manualBtn').href   = url || '#';
-  showPage('page_P04_Review');
-  if (url) setTimeout(() => { window.location.href = url; }, 900);
-}
-
-// ============================================================
-// P08_RESUME — open Drive
-// ============================================================
-function routeResume(s, n) {
-  const name = s.n || n || 'Resume';
-  const url  = s.d || '';
-  document.getElementById('p08_name').textContent = name + "'s Resume";
-  document.getElementById('p08_manualBtn').href   = url || '#';
-  showPage('page_P08_Resume');
-  if (url) setTimeout(() => { window.open(url, '_blank'); }, 800);
-}
-
-// ============================================================
-// P09_WIFI — connect
-// ============================================================
-let _wifiPass = '';
-function routeWifi(s, n) {
-  const ssid = s.s || '';
-  const pass = s.p || '';
-  _wifiPass  = pass;
-
-  document.getElementById('p09_ssid').textContent = ssid || 'Unknown SSID';
-  document.getElementById('p09_pass').textContent = pass
-    ? pass.charAt(0) + '*'.repeat(Math.max(pass.length - 2, 0)) + pass.charAt(pass.length - 1)
-    : '---';
-
-  // WiFi protocol: WIFI:S:<SSID>;T:WPA;P:<Password>;;
-  const wifiLink = 'WIFI:S:' + ssid + ';T:WPA;P:' + pass + ';;';
-  // Some browsers support wifi:// but most need the WIFI: string in QR only
-  // Provide a mecard-style link as fallback
-  document.getElementById('p09_connectBtn').href = 'wifi://' + encodeURIComponent(ssid);
-  document.getElementById('p09_connectBtn').setAttribute('data-wifi', wifiLink);
-  document.getElementById('p09_connectBtn').onclick = function(e) {
-    e.preventDefault();
-    // Try to open the wifi QR string as a URI — Android/iOS handle it from QR natively
-    // Provide copy fallback
-    copyWifiDetails(ssid, pass);
-  };
-
-  showPage('page_P09_WiFi');
-}
-
-function copyPassword() {
-  if (_wifiPass) {
-    navigator.clipboard.writeText(_wifiPass).then(() => {
-      const el = document.getElementById('p09_pass');
-      el.textContent = _wifiPass + ' (copied)';
-      setTimeout(() => {
-        el.textContent = _wifiPass.charAt(0) + '*'.repeat(Math.max(_wifiPass.length - 2, 0)) + _wifiPass.charAt(_wifiPass.length - 1);
-      }, 2000);
-    });
-  }
-}
-
-function copyWifiDetails(ssid, pass) {
-  navigator.clipboard.writeText('WiFi: ' + ssid + '\nPassword: ' + pass).then(() => {
-    alert('WiFi details copied to clipboard!\nSSID: ' + ssid + '\nPassword: ' + pass);
-  });
-}
-
-// ============================================================
-// P12_INVITE — PIN-protected
-// ============================================================
-let _inviteSecret = {};
-function routeInvite(s, n) {
-  _inviteSecret = s;
-  showPage('page_P12_Invite');
-}
-
-function pinNext(idx) {
-  const el = document.getElementById('pin' + idx);
-  el.classList.add('filled');
-  if (el.value && idx < 3) {
-    document.getElementById('pin' + (idx + 1)).focus();
-  }
-  // Auto-verify when all 4 filled
-  if (idx === 3 && el.value) verifyPin();
-}
-
-function pinBack(e, idx) {
-  if (e.key === 'Backspace') {
-    const el = document.getElementById('pin' + idx);
-    if (!el.value && idx > 0) {
-      document.getElementById('pin' + (idx - 1)).focus();
-      document.getElementById('pin' + (idx - 1)).value = '';
-    }
-  }
-}
-
-function verifyPin() {
-  const entered = [0,1,2,3].map(i => document.getElementById('pin' + i).value).join('');
-  const correct = String(_inviteSecret.k || '');
-  if (entered === correct) {
-    showInviteDetails();
-  } else {
-    document.getElementById('p12_pinError').textContent = 'Incorrect PIN. Please try again.';
-    [0,1,2,3].forEach(i => {
-      const el = document.getElementById('pin' + i);
-      el.classList.add('error');
-      setTimeout(() => el.classList.remove('error'), 600);
-    });
-    setTimeout(() => {
-      [0,1,2,3].forEach(i => {
-        document.getElementById('pin' + i).value = '';
-        document.getElementById('pin' + i).classList.remove('filled');
-      });
-      document.getElementById('pin0').focus();
-      document.getElementById('p12_pinError').textContent = '';
-    }, 700);
-  }
-}
-
-function showInviteDetails() {
-  const s = _inviteSecret;
-  document.getElementById('p12_pinView').style.display = 'none';
-  const dv = document.getElementById('p12_detailView');
-  dv.style.display = 'block';
-
-  document.getElementById('p12_eventName').textContent = s.ev || 'Event';
-  document.getElementById('p12_hostName').textContent  = 'Hosted by ' + (s.n || '---');
-  document.getElementById('p12_date').textContent      = s.dt || '---';
-  document.getElementById('p12_mapsBtn').href          = s.m  || '#';
-  document.getElementById('p12_videoBtn').href         = s.vl || '#';
-}
-
-// ============================================================
-// P15_STATIC — Static Location (PIN-protected)
-// ============================================================
-let _staticSecret = {};
-function routeStatic(s, n) {
-  _staticSecret = s;
-  showPage('page_P15_Static');
-}
-
-function pinNext15(idx) {
-  const el = document.getElementById('p15_pin' + idx);
-  el.classList.add('filled');
-  if (el.value && idx < 3) {
-    document.getElementById('p15_pin' + (idx + 1)).focus();
-  }
-  if (idx === 3 && el.value) verifyPin15();
-}
-
-function pinBack15(e, idx) {
-  if (e.key === 'Backspace') {
-    const el = document.getElementById('p15_pin' + idx);
-    if (!el.value && idx > 0) {
-      document.getElementById('p15_pin' + (idx - 1)).focus();
-      document.getElementById('p15_pin' + (idx - 1)).value = '';
-    }
-  }
-}
-
-function verifyPin15() {
-  const entered = [0,1,2,3].map(i => document.getElementById('p15_pin' + i).value).join('');
-  const correct = String(_staticSecret.k || '');
-  if (entered === correct) {
-    showStaticDetails();
-  } else {
-    document.getElementById('p15_pinError').textContent = 'Incorrect PIN. Please try again.';
-    [0,1,2,3].forEach(i => {
-      const el = document.getElementById('p15_pin' + i);
-      el.classList.add('error');
-      setTimeout(() => el.classList.remove('error'), 600);
-    });
-    setTimeout(() => {
-      [0,1,2,3].forEach(i => {
-        document.getElementById('p15_pin' + i).value = '';
-        document.getElementById('p15_pin' + i).classList.remove('filled');
-      });
-      document.getElementById('p15_pin0').focus();
-      document.getElementById('p15_pinError').textContent = '';
-    }, 700);
-  }
-}
-
-function showStaticDetails() {
-  const s = _staticSecret;
-  document.getElementById('p15_pinView').style.display = 'none';
-  const dv = document.getElementById('p15_detailView');
-  dv.style.display = 'block';
-
-  document.getElementById('p15_locationName').textContent = s.loc || 'Location';
-  document.getElementById('p15_address').textContent      = s.wa || '---';
-  document.getElementById('p15_mapsBtn').href             = s.m  || '#';
-  document.getElementById('p15_videoBtn').href            = s.vl || '#';
-}
-
-// ============================================================
-// BOOT
-// ============================================================
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(route, 400);
-});
+route();
 </script>
 </body>
 </html>
