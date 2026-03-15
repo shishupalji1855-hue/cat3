@@ -565,16 +565,16 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-title">// Category</div>
-    <button class="cat-btn disabled" id="cat1" onclick="selectCategory(1)">
+    <button class="cat-btn" id="cat1" onclick="selectCategory(1)">
       <span class="cat-num">C1</span> Standard Tags
     </button>
-    <button class="cat-btn disabled" id="cat2" onclick="selectCategory(2)">
+    <button class="cat-btn" id="cat2" onclick="selectCategory(2)">
       <span class="cat-num">C2</span> Smart NFC
     </button>
     <button class="cat-btn active" id="cat3" onclick="selectCategory(3)">
       <span class="cat-num">C3</span> QR Services
     </button>
-    <button class="cat-btn disabled" id="cat4" onclick="selectCategory(4)">
+    <button class="cat-btn" id="cat4" onclick="selectCategory(4)">
       <span class="cat-num">C4</span> Hybrid Combo
     </button>
 
@@ -684,13 +684,42 @@ const SCANNER_URL  = new URL('scanner_tabs.html', window.location.href).toString
 // Each service: fields array ordered as per spec
 // type: '#' = QR+Sheet, '$' = Sheet only, '!' = auto
 const SERVICES = {
+  P00_Human: {
+    label: 'Human Safety',
+    tab:   'P00_Human',
+    cat:   1,
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: 'c',   label: 'Customer ID',  ph: 'e.g. 1000',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Person_Name',type: '#', short: 'n',   label: 'Person Name',  ph: 'Full name',     input: 'text'   },
+      { header: 'Emergency1', type: '#', short: 'e',   label: 'Emergency Contact', ph: '91XXXXXXXXXX', input: 'text'   },
+      { header: 'Email1',     type: '#', short: 'e1',  label: 'Email 1',      ph: 'primary@email.com', input: 'email'  },
+      { header: 'Email2',     type: '#', short: 'e2',  label: 'Email 2',      ph: 'secondary@email.com', input: 'email', required: false },
+      { header: 'WACompany',  type: '#', short: 'wa',  label: 'Company WA',   ph: '91XXXXXXXXXX', input: 'text'   },
+      { header: 'Owner_PIN',  type: '#', short: 'k',   label: 'Owner PIN',    ph: '4-digit PIN',   input: 'password' },
+    ]
+  },
+  P00_Value: {
+    label: 'Value Safety',
+    tab:   'P00_Value',
+    cat:   2,
+    fields: [
+      { header: 'Timestamp',  type: '!', short: null },
+      { header: 'Cust_ID',    type: '$', short: 'c',   label: 'Customer ID',  ph: 'e.g. 2000',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Person_Name',type: '#', short: 'n',   label: 'Owner Name',   ph: 'Full name',     input: 'text'   },
+      { header: 'Email1',     type: '#', short: 'e1',  label: 'Email 1',      ph: 'primary@email.com', input: 'email'  },
+      { header: 'Email2',     type: '#', short: 'e2',  label: 'Email 2',      ph: 'secondary@email.com', input: 'email', required: false },
+      { header: 'WACompany',  type: '#', short: 'wa',  label: 'Company WA',   ph: '91XXXXXXXXXX', input: 'text'   },
+      { header: 'Owner_PIN',  type: '#', short: 'k',   label: 'Owner PIN',    ph: '4-digit PIN',   input: 'password' },
+    ]
+  },
   P01_Pay: {
     label: 'UPI Payment',
     tab:   'P01_Pay',
-    // key mapping: full header -> 1-letter short key (for QR compression)
+    cat:   3,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',    type: '$', short: 'c',   label: 'Customer ID',  ph: 'e.g. 1001',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',     input: 'text'   },
       { header: 'QR_Link_ID', type: '#', short: 'u',   label: 'QR Link ID',   ph: 'https://...',   input: 'text', sheetHeader: 'UPI_ID' },
     ]
@@ -698,9 +727,10 @@ const SERVICES = {
   P03_Biz: {
     label: 'Business Card',
     tab:   'P03_Biz',
+    cat:   3,
     fields: [
       { header: 'Timestamp',    type: '!', short: null },
-      { header: 'Cust_ID',      type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1002',   input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',      type: '$', short: 'c',   label: 'Customer ID',    ph: 'e.g. 1002',   input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',         type: '#', short: 'n',   label: 'Name',           ph: 'Full name',   input: 'text'   },
       { header: 'Job',          type: '#', short: 'j',   label: 'Job / Title',    ph: 'Designation', input: 'text'   },
       { header: 'Phone',        type: '#', short: 'p',   label: 'Phone',          ph: '+91XXXXXXXXXX',input:'text'  },
@@ -710,9 +740,10 @@ const SERVICES = {
   P04_Review: {
     label: 'Google Review',
     tab:   'P04_Review',
+    cat:   3,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID',  ph: 'e.g. 1003', input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',    type: '$', short: 'c',   label: 'Customer ID',  ph: 'e.g. 1003', input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Name',         ph: 'Full name',  input: 'text'   },
       { header: 'Review_URL', type: '#', short: 'r',   label: 'Review URL',   ph: 'https://g.page/...', input: 'url' },
     ]
@@ -720,9 +751,10 @@ const SERVICES = {
   P08_Resume: {
     label: 'Resume / CV',
     tab:   'P08_Resume',
+    cat:   3,
     fields: [
       { header: 'Timestamp', type: '!', short: null },
-      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1008', input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',   type: '$', short: 'c',   label: 'Customer ID', ph: 'e.g. 1008', input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',      type: '#', short: 'n',   label: 'Name',        ph: 'Full name',  input: 'text'   },
       { header: 'Drive_URL', type: '#', short: 'd',   label: 'Drive URL',   ph: 'https://drive.google.com/...', input: 'url' },
     ]
@@ -730,9 +762,10 @@ const SERVICES = {
   P09_WiFi: {
     label: 'WiFi Connect',
     tab:   'P09_WiFi',
+    cat:   3,
     fields: [
       { header: 'Timestamp', type: '!', short: null },
-      { header: 'Cust_ID',   type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1009',  input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',   type: '$', short: 'c',   label: 'Customer ID', ph: 'e.g. 1009',  input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'SSID',      type: '#', short: 's',   label: 'WiFi Name (SSID)', ph: 'Network name', input: 'text' },
       { header: 'Password',  type: '#', short: 'p',   label: 'Password', ph: 'WiFi password', input: 'text' },
     ]
@@ -740,9 +773,10 @@ const SERVICES = {
   P12_Invite: {
     label: 'Event Invite',
     tab:   'P12_Invite',
+    cat:   3,
     fields: [
       { header: 'Timestamp',  type: '!', short: null },
-      { header: 'Cust_ID',    type: '$', short: null,  label: 'Customer ID', ph: 'e.g. 1012',       input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',    type: '$', short: 'c',   label: 'Customer ID', ph: 'e.g. 1012',       input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',       type: '#', short: 'n',   label: 'Host Name',   ph: 'Your name',        input: 'text'   },
       { header: 'PIN',        type: '#', short: 'k',   label: 'PIN (4-digit)',ph: '****',             input: 'text'   },
       { header: 'Event_Name', type: '#', short: 'ev',  label: 'Event Name',  ph: 'Wedding / Party',  input: 'text'   },
@@ -751,12 +785,27 @@ const SERVICES = {
       { header: 'Video_Link', type: '#', short: 'vl',  label: 'Video Link',  ph: 'https://youtube...',input: 'url'   },
     ]
   },
+  P13_Doc: {
+    label: 'Doc Vault',
+    tab:   'P13_Doc',
+    cat:   4,
+    fields: [
+      { header: 'Timestamp',        type: '!', short: null },
+      { header: 'Cust_ID',          type: '$', short: 'c',   label: 'Customer ID',    ph: 'e.g. 4000',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Name',             type: '#', short: 'n',   label: 'Name',           ph: 'Owner name',    input: 'text'   },
+      { header: 'Gadi_Number',      type: '#', short: 'v',   label: 'Gadi Number',    ph: 'UK07-AB-1234',  input: 'text'   },
+      { header: 'Drive_Link',       type: '#', short: 'dl',  label: 'Drive Link',     ph: 'Paste Drive Link', input: 'url' },
+      { header: 'Drive_Password',   type: '#', short: 'dp',  label: 'Drive Password', ph: 'Password (if any)', input: 'text', required: false },
+      { header: 'Free_PDF_Link',    type: '#', short: 'fp',  label: 'Free PDF Link',  ph: 'Direct PDF Link',  input: 'url', required: false },
+    ]
+  },
   P15_Static: {
     label: 'Static Location',
     tab:   'P15_Static',
+    cat:   3,
     fields: [
       { header: 'Timestamp',        type: '!', short: null },
-      { header: 'Cust_ID',          type: '$', short: null,  label: 'Customer ID',    ph: 'e.g. 1015',          input: 'number', sheetHeader: 'Cust_ID(No.)' },
+      { header: 'Cust_ID',          type: '$', short: 'c',   label: 'Customer ID',    ph: 'e.g. 1015',          input: 'number', sheetHeader: 'Cust_ID(No.)' },
       { header: 'Name',             type: '$', short: null,  label: 'Name',           ph: 'Owner / Contact',    input: 'text'   },
       { header: 'PIN',              type: '#', short: 'k',   label: 'PIN (4-digit)',  ph: '****',               input: 'text'   },
       { header: 'Name of location', type: '#', short: 'loc', label: 'Name of location', ph: 'Location name',    input: 'text'   },
@@ -772,10 +821,11 @@ let currentService = null;
 // ============================================================
 // INIT — populate service buttons
 // ============================================================
-function initServiceButtons() {
+function initServiceButtons(catNum = 3) {
   const grid = document.getElementById('serviceGrid');
   grid.innerHTML = '';
   Object.entries(SERVICES).forEach(([key, svc]) => {
+    if (svc.cat !== catNum) return;
     const btn = document.createElement('button');
     btn.className = 'svc-btn';
     btn.id = 'svc_' + key;
@@ -786,7 +836,22 @@ function initServiceButtons() {
 }
 
 function selectCategory(n) {
-  if (n !== 3) { showToast('Category ' + n + ' is not active in this build.', 'info'); return; }
+  // Update active state on cat buttons
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('cat' + n).classList.add('active');
+  
+  // Update service grid
+  initServiceButtons(n);
+  
+  // Show info if no service selected
+  document.getElementById('mainTitle').textContent = 'Category ' + n;
+  document.getElementById('mainDesc').textContent = 'Select a service type from the sidebar to begin building.';
+  document.getElementById('formContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-title">No service selected</div>
+        <div class="empty-state-desc">Choose a service type from the<br/>left sidebar to load its form.</div>
+      </div>
+  `;
 }
 
 // ============================================================
