@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10haath Security Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; background: #0a0a0f; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: white; color: #1a1a1a; width: 100%; max-width: 400px; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .btn { padding: 16px; border-radius: 12px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.3s; display: block; width: 100%; border: none; font-size: 16px; }
+        .btn-primary { background: #e8490f; color: white; }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: inherit; }
+        .input:focus { border-color: #e8490f; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; background: #f8f8f8; color: #888; }
+        .tab.active { background: white; color: #e8490f; border-bottom: 3px solid #e8490f; }
+        .timer { font-size: 32px; font-weight: bold; color: #e8490f; font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body>
+
+<div id="loader" class="text-white text-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+    <p>Authenticating Security Tag...</p>
+</div>
+
+<div id="mainCard" class="card hidden">
+    <!-- Cat 1 Tabs -->
+    <div id="cat1Tabs" class="flex hidden">
+        <div class="tab active" onclick="switchTab('savior')">SAVIOR</div>
+        <div class="tab" onclick="switchTab('owner')">OWNER</div>
+    </div>
+
+    <div class="p-6">
+        <!-- Savior Side (Cat 1 & 2) -->
+        <div id="saviorView" class="hidden">
+            <h2 class="text-xl font-bold mb-2">Emergency Alert</h2>
+            <p class="text-gray-500 text-sm mb-6">Owner ko turant alert bhejne ke liye niche button dabayein.</p>
+            
+            <div id="waStep">
+                <button class="btn btn-wa mb-4" onclick="showSaviorForm()">
+                    📱 Send WhatsApp Alert
+                </button>
+            </div>
+
+            <div id="saviorForm" class="hidden">
+                <label class="text-xs font-bold text-gray-400 block mb-1">YOUR PHONE NUMBER</label>
+                <input type="number" id="saviorPhone" class="input" placeholder="91XXXXXXXXXX">
+                
+                <label class="text-xs font-bold text-gray-400 block mb-1">DIKKAT / PROBLEM</label>
+                <textarea id="saviorDikkat" class="input h-24" placeholder="Gadi lock hai / Emergency / Shisha khula hai..."></textarea>
+                
+                <button class="btn btn-primary" onclick="submitSaviorAlert()">Submit & Send Email</button>
+            </div>
+        </div>
+
+        <!-- Owner Side (Cat 1) -->
+        <div id="ownerView" class="hidden">
+            <h2 class="text-xl font-bold mb-2">Owner Portal</h2>
+            <div id="ownerLogin">
+                <p class="text-gray-500 text-sm mb-6">Enter PIN to access owner settings.</p>
+                <input type="password" id="ownerPin" class="input" placeholder="Enter PIN">
+                <button class="btn btn-primary" onclick="verifyOwnerPin()">Verify PIN</button>
+            </div>
+
+            <div id="ownerPanel" class="hidden">
+                <p class="text-gray-500 text-sm mb-4">Update Location Link:</p>
+                <a id="mapBtn" href="https://www.google.com/maps" target="_blank" class="btn btn-secondary mb-4 flex items-center justify-center gap-2">
+                    📍 Open Google Maps
+                </a>
+                <input type="text" id="locLink1" class="input" placeholder="Paste Map Link 1">
+                <input type="text" id="locLink2" class="input" placeholder="Paste Map Link 2">
+                <button class="btn btn-primary" onclick="saveOwnerLocation()">Save & WhatsApp Share</button>
+            </div>
+        </div>
+
+        <!-- Cat 3: P01_Pay -->
+        <div id="payView" class="hidden">
+            <h2 class="text-xl font-bold mb-1" id="payName">Merchant</h2>
+            <p class="text-gray-500 text-xs mb-4" id="payUpi">upi@id</p>
+            <div class="bg-gray-50 p-4 rounded-xl mb-6 text-center">
+                <span class="text-gray-400 text-xs block mb-1">ENTER AMOUNT</span>
+                <input type="number" class="input text-2xl font-bold text-center mb-0" placeholder="₹ 0.00">
+            </div>
+            <button class="btn btn-primary">Pay Fast Now</button>
+        </div>
+
+        <!-- Cat 3: P03_Biz -->
+        <div id="bizView" class="hidden">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">👤</div>
+                <h2 class="text-2xl font-bold" id="bizName">Name</h2>
+                <p class="text-gray-500" id="bizJob">Job Title</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-6" id="socialLinks">
+                <!-- Links will be added here -->
+            </div>
+            <button class="btn btn-primary" onclick="saveContact()">Save Contact</button>
+        </div>
+
+        <!-- Cat 3: P12_Invite / P15_Static -->
+        <div id="pinProtectedView" class="hidden">
+            <h2 class="text-xl font-bold mb-2" id="pinTitle">Secure Access</h2>
+            <div id="pinEntry">
+                <p class="text-gray-500 text-sm mb-6">Enter PIN to view details.</p>
+                <input type="password" id="securePin" class="input" placeholder="Enter 4-Digit PIN">
+                <button class="btn btn-primary" onclick="verifySecurePin()">Unlock</button>
+            </div>
+            <div id="secureDetails" class="hidden">
+                <div id="inviteDetails" class="hidden">
+                    <h3 class="text-2xl font-bold text-red-600 mb-1" id="eventTitle">Event</h3>
+                    <p class="text-gray-600 mb-1" id="hostName">Host: </p>
+                    <p class="font-bold text-gray-800 mb-6" id="eventDate">Date: </p>
+                </div>
+                <div id="staticDetails" class="hidden">
+                    <h3 class="text-2xl font-bold text-blue-600 mb-1" id="locName">Location</h3>
+                    <p class="text-gray-600 mb-6" id="locAddress">Address: </p>
+                </div>
+                <a id="secureMap" href="#" target="_blank" class="btn btn-secondary mb-3">📍 View on Maps</a>
+                <a id="secureVideo" href="#" target="_blank" class="btn btn-secondary">🎥 Watch Video</a>
+            </div>
+        </div>
+
+        <!-- Cat 4: P13_Doc -->
+        <div id="docView" class="hidden text-center">
+            <h2 class="text-xl font-bold mb-2">Doc Vault Security</h2>
+            <p class="text-gray-500 text-xs mb-6">Document access valid for 20 minutes only.</p>
+            
+            <div id="docTimerArea" class="hidden">
+                <div class="timer mb-6" id="timeLeft">20:00</div>
+                <div id="docPasswordArea" class="hidden">
+                    <p class="text-xs text-gray-400 mb-2">ENTER PASSWORD PROVIDED BY OWNER</p>
+                    <input type="password" id="docInputPass" class="input" placeholder="Enter Password">
+                    <button class="btn btn-primary" onclick="openDoc()">Open Document PDF</button>
+                </div>
+                <div id="docRequestArea">
+                    <button class="btn btn-primary" onclick="requestDocAccess()">REQUEST DRIVE ACCESS</button>
+                    <p class="text-[10px] text-gray-400 mt-4">Note: Owner will share the password after verification.</p>
+                </div>
+            </div>
+
+            <div id="docStart">
+                <button class="btn btn-primary" onclick="startDocTimer()">START 20 MIN SESSION</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const SHEETDB_URL = "https://sheetdb.io/api/v1/v6o6w7t4wsq7z";
+    let currentData = null;
+    let serviceType = null;
+    let customerId = null;
+
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const s = params.get('s');
+        if(!s) return alert("Invalid QR Code!");
+
+        try {
+            const payload = JSON.parse(atob(s));
+            serviceType = payload.t;
+            customerId = payload.c;
+            
+            // Map Cust_ID header based on service
+            let idHeader = "Cust_ID";
+            if(["P00_Human", "P00_Value", "P15_Static"].includes(serviceType)) {
+                idHeader = "Cust_ID(No.)";
+            }
+
+            // Fetch data from SheetDB
+            const response = await fetch(`${SHEETDB_URL}/search?${idHeader}=${customerId}&sheet=${serviceType}`);
+            const data = await response.json();
+            
+            if(!data || data.length === 0) throw new Error("Tag data not found!");
+            currentData = data[0];
+
+            renderUI();
+        } catch (err) {
+            console.error(err);
+            document.getElementById('loader').innerHTML = `<p class="text-red-500">Error: ${err.message}</p>`;
+        }
+    }
+
+    function renderUI() {
+        document.getElementById('loader').classList.add('hidden');
+        document.getElementById('mainCard').classList.remove('hidden');
+
+        if(serviceType === "P00_Human") {
+            document.getElementById('cat1Tabs').classList.remove('hidden');
+            document.getElementById('saviorView').classList.remove('hidden');
+        } else if(serviceType === "P00_Value") {
+            document.getElementById('saviorView').classList.remove('hidden');
+        } else if(serviceType === "P01_Pay") {
+            document.getElementById('payView').classList.remove('hidden');
+            document.getElementById('payName').innerText = currentData.Name;
+            document.getElementById('payUpi').innerText = currentData.UPI_ID;
+        } else if(serviceType === "P03_Biz") {
+            document.getElementById('bizView').classList.remove('hidden');
+            document.getElementById('bizName').innerText = currentData.Name;
+            document.getElementById('bizJob').innerText = currentData.Job;
+            const socials = document.getElementById('socialLinks');
+            const links = [
+                { id: 'Phone', icon: '📞', label: 'Call' },
+                { id: 'Email', icon: '✉️', label: 'Email' },
+                { id: 'Instagram', icon: '📸', label: 'Instagram' },
+                { id: 'LinkedIn', icon: '💼', label: 'LinkedIn' },
+                { id: 'Website', icon: '🌐', label: 'Website' }
+            ];
+            links.forEach(l => {
+                if(currentData[l.id]) {
+                    const a = document.createElement('a');
+                    a.href = l.id === 'Phone' ? `tel:${currentData[l.id]}` : (l.id === 'Email' ? `mailto:${currentData[l.id]}` : currentData[l.id]);
+                    a.className = "p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-sm font-bold border border-gray-100 hover:bg-gray-100";
+                    a.innerHTML = `<span>${l.icon}</span> ${l.label}`;
+                    socials.appendChild(a);
+                }
+            });
+        } else if(serviceType === "P04_Review") {
+            window.location.href = currentData.Review_URL;
+        } else if(serviceType === "P08_Resume") {
+            window.location.href = currentData.Resume_Link;
+        } else if(serviceType === "P12_Invite" || serviceType === "P15_Static") {
+            document.getElementById('pinProtectedView').classList.remove('hidden');
+            document.getElementById('pinTitle').innerText = serviceType === "P12_Invite" ? "Event Invitation" : "Location Details";
+        } else if(serviceType === "P13_Doc") {
+            document.getElementById('docView').classList.remove('hidden');
+        }
+    }
+
+    // --- Tab Switching ---
+    function switchTab(view) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        if(view === 'savior') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('saviorView').classList.remove('hidden');
+            document.getElementById('ownerView').classList.add('hidden');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('ownerView').classList.remove('hidden');
+            document.getElementById('saviorView').classList.add('hidden');
+        }
+    }
+
+    // --- Savior Logic ---
+    function showSaviorForm() {
+        document.getElementById('waStep').classList.add('hidden');
+        document.getElementById('saviorForm').classList.remove('hidden');
+    }
+
+    async function submitSaviorAlert() {
+        const phone = document.getElementById('saviorPhone').value;
+        const dikkat = document.getElementById('saviorDikkat').value;
+        if(!phone || !dikkat) return alert("Kripya dono jankari bharein!");
+
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            // Record alert to Sheet
+            await fetch(`${SHEETDB_URL}?sheet=All_Alerts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [{
+                    Timestamp: new Date().toLocaleString(),
+                    Cust_ID: customerId,
+                    ScannerNo: phone,
+                    Dikkat: dikkat,
+                    Type: serviceType
+                }]})
+            });
+
+            // Prepare Email
+            const subject = `🚨 10haath Security Alert: ${customerId}`;
+            const body = `Emergency Alert for your ${serviceType === 'P00_Human' ? 'Human' : 'Value'} Tag (${customerId}).\n\nProblem: ${dikkat}\nScanner Phone: ${phone}\n\nPlease check immediately.`;
+            const mailto = `mailto:${currentData.Email1}${currentData.Email2 ? ','+currentData.Email2 : ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            window.location.href = mailto;
+            btn.innerText = "Email App Opened!";
+        } catch (err) {
+            alert("Error sending alert: " + err.message);
+            btn.disabled = false;
+        }
+    }
+
+    // --- Owner Logic ---
+    function verifyOwnerPin() {
+        const pin = document.getElementById('ownerPin').value;
+        if(pin === currentData.Owner_PIN) {
+            document.getElementById('ownerLogin').classList.add('hidden');
+            document.getElementById('ownerPanel').classList.remove('hidden');
+        } else {
+            alert("Incorrect PIN!");
+        }
+    }
+
+    async function saveOwnerLocation() {
+        const link1 = document.getElementById('locLink1').value;
+        const link2 = document.getElementById('locLink2').value;
+        if(!link1) return alert("Kripya location link dalein!");
+
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerText = "Saving...";
+
+        try {
+            let idHeader = "Cust_ID";
+            if(["P00_Human", "P00_Value", "P15_Static"].includes(serviceType)) {
+                idHeader = "Cust_ID(No.)";
+            }
+
+            // Update Sheet
+            const response = await fetch(`${SHEETDB_URL}/${idHeader}/${customerId}?sheet=${serviceType}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: { Maps_Link: link1, Extra_Link: link2 }})
+            });
+
+            if(!response.ok) throw new Error("Update failed");
+
+            // WhatsApp Redirect
+            const msg = `Help Needed! My Location: ${link1}`;
+            const targetPhone = currentData.Emergency1 || currentData.WACompany;
+            window.location.href = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
+        } catch (err) {
+            alert("Error saving: " + err.message);
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    }
+
+    // --- Secure Pin (Invite/Static) ---
+    function verifySecurePin() {
+        const pin = document.getElementById('securePin').value;
+        if(pin === currentData.PIN) {
+            document.getElementById('pinEntry').classList.add('hidden');
+            document.getElementById('secureDetails').classList.remove('hidden');
+            if(serviceType === "P12_Invite") {
+                document.getElementById('inviteDetails').classList.remove('hidden');
+                document.getElementById('eventTitle').innerText = currentData.Event_Name;
+                document.getElementById('hostName').innerText = "Host: " + currentData.Host_Name;
+                document.getElementById('eventDate').innerText = "Date: " + currentData.Date;
+            } else {
+                document.getElementById('staticDetails').classList.remove('hidden');
+                document.getElementById('locName').innerText = currentData['Name of location'] || currentData.Location_Name;
+                document.getElementById('locAddress').innerText = "Address: " + (currentData['Written Address'] || currentData.Address);
+            }
+            document.getElementById('secureMap').href = currentData.Maps_Link;
+            if(currentData.Video_Link) {
+                document.getElementById('secureVideo').href = currentData.Video_Link;
+                document.getElementById('secureVideo').classList.remove('hidden');
+            } else {
+                document.getElementById('secureVideo').classList.add('hidden');
+            }
+        } else {
+            alert("Incorrect PIN!");
+        }
+    }
+
+    // --- Doc Vault Logic ---
+    let docTimer = null;
+    function startDocTimer() {
+        document.getElementById('docStart').classList.add('hidden');
+        document.getElementById('docTimerArea').classList.remove('hidden');
+        let sec = 1200;
+        docTimer = setInterval(() => {
+            sec--;
+            let mins = Math.floor(sec / 60);
+            let rs = sec % 60;
+            document.getElementById('timeLeft').innerText = `${mins}:${rs < 10 ? '0' : ''}${rs}`;
+            if(sec <= 0) {
+                clearInterval(docTimer);
+                document.body.innerHTML = "<div class='card p-10 text-center text-red-500 font-bold'>Session Expired!</div>";
+            }
+        }, 1000);
+    }
+
+    async function requestDocAccess() {
+        // In a real app, this would notify the owner. 
+        // For now, we simulate by showing the password box.
+        alert("Access Request Sent to Owner! Please wait for the password.");
+        document.getElementById('docRequestArea').classList.add('hidden');
+        document.getElementById('docPasswordArea').classList.remove('hidden');
+    }
+
+    function openDoc() {
+        const pass = document.getElementById('docInputPass').value;
+        if(pass === currentData.Drive_Password) {
+            window.location.href = currentData.Drive_Link;
+        } else {
+            alert("Incorrect Password!");
+        }
+    }
+
+    function saveContact() {
+        const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${currentData.Name}\nTEL:${currentData.Phone}\nEMAIL:${currentData.Email || ''}\nEND:VCARD`;
+        const blob = new Blob([vcard], { type: 'text/vcard' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentData.Name}.vcf`;
+        a.click();
+    }
+
+    init();
+</script>
+</body>
+</html>
