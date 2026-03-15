@@ -5,145 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10haath Security Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet"/>
     <style>
         body { font-family: 'Space Grotesk', sans-serif; background: #0a0a0f; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .card { background: white; color: #1a1a1a; width: 100%; max-width: 400px; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .btn { padding: 16px; border-radius: 12px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.3s; display: block; width: 100%; border: none; font-size: 16px; }
+        .btn { padding: 16px; border-radius: 12px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.3s; display: block; width: 100%; border: none; font-size: 16px; font-family: inherit; }
         .btn-primary { background: #e8490f; color: white; }
         .btn-wa { background: #25D366; color: white; }
         .btn-secondary { background: #f0f0f0; color: #333; }
         .input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; margin-bottom: 15px; outline: none; font-family: inherit; }
         .input:focus { border-color: #e8490f; }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; background: #f8f8f8; color: #888; }
-        .tab.active { background: white; color: #e8490f; border-bottom: 3px solid #e8490f; }
-        .timer { font-size: 32px; font-weight: bold; color: #e8490f; font-family: 'JetBrains Mono', monospace; }
+        .tab-bar { display: flex; background: #f8f8f8; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; color: #888; border-bottom: 2px solid transparent; }
+        .tab.active { background: white; color: #e8490f; border-bottom: 2px solid #e8490f; }
+        .timer { font-size: 32px; font-weight: bold; color: #e8490f; font-family: 'IBM Plex Mono', monospace; }
+        .mono { font-family: 'IBM Plex Mono', monospace; }
     </style>
 </head>
 <body>
 
 <div id="loader" class="text-white text-center">
     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-    <p>Authenticating Security Tag...</p>
+    <p class="mono text-xs uppercase tracking-widest">Authenticating Security Tag...</p>
 </div>
 
 <div id="mainCard" class="card hidden">
-    <!-- Cat 1 Tabs -->
-    <div id="cat1Tabs" class="flex hidden">
-        <div class="tab active" onclick="switchTab('savior')">SAVIOR</div>
-        <div class="tab" onclick="switchTab('owner')">OWNER</div>
+    <!-- Tabs for Human Safety (Cat 1) -->
+    <div id="cat1Tabs" class="tab-bar hidden">
+        <div class="tab active" id="tabSavior" onclick="switchTab('savior')">SAVIOR</div>
+        <div class="tab" id="tabOwner" onclick="switchTab('owner')">OWNER</div>
     </div>
 
     <div class="p-6">
-        <!-- Savior Side (Cat 1 & 2) -->
+        <!-- 1. Savior Workflow (Cat 1 & 2) -->
         <div id="saviorView" class="hidden">
-            <h2 class="text-xl font-bold mb-2">Emergency Alert</h2>
-            <p class="text-gray-500 text-sm mb-6">Owner ko turant alert bhejne ke liye niche button dabayein.</p>
+            <h2 class="text-xl font-bold mb-2">Security Alert</h2>
+            <p class="text-gray-500 text-sm mb-6">Owner ko alert bhejne ke liye niche steps follow karein.</p>
             
             <div id="waStep">
-                <button class="btn btn-wa mb-4" onclick="showSaviorForm()">
-                    📱 Send WhatsApp Alert
+                <button class="btn btn-wa mb-4 flex items-center justify-center gap-2" onclick="startSaviorForm()">
+                    📱 Step 1: WhatsApp Verify
                 </button>
+                <p class="text-[10px] text-center text-gray-400">Pehle verification ke liye WhatsApp par message bhejein.</p>
             </div>
 
             <div id="saviorForm" class="hidden">
-                <label class="text-xs font-bold text-gray-400 block mb-1">YOUR PHONE NUMBER</label>
-                <input type="number" id="saviorPhone" class="input" placeholder="91XXXXXXXXXX">
+                <label class="text-[10px] font-bold text-gray-400 block mb-1 uppercase">Step 2: Your Phone Number</label>
+                <input type="number" id="savPhone" class="input" placeholder="91XXXXXXXXXX">
                 
-                <label class="text-xs font-bold text-gray-400 block mb-1">DIKKAT / PROBLEM</label>
-                <textarea id="saviorDikkat" class="input h-24" placeholder="Gadi lock hai / Emergency / Shisha khula hai..."></textarea>
+                <label class="text-[10px] font-bold text-gray-400 block mb-1 uppercase">Step 3: Dikkat / Problem</label>
+                <textarea id="savReason" class="input h-24" placeholder="Emergency / Gadi lock hai / Shisha khula hai..."></textarea>
                 
                 <button class="btn btn-primary" onclick="submitSaviorAlert()">Submit & Send Email</button>
             </div>
         </div>
 
-        <!-- Owner Side (Cat 1) -->
+        <!-- 2. Owner Workflow (Cat 1) -->
         <div id="ownerView" class="hidden">
             <h2 class="text-xl font-bold mb-2">Owner Portal</h2>
             <div id="ownerLogin">
-                <p class="text-gray-500 text-sm mb-6">Enter PIN to access owner settings.</p>
-                <input type="password" id="ownerPin" class="input" placeholder="Enter PIN">
+                <p class="text-gray-500 text-sm mb-6">Enter PIN to update security details.</p>
+                <input type="password" id="ownerPinInput" class="input" placeholder="Enter 4-Digit PIN">
                 <button class="btn btn-primary" onclick="verifyOwnerPin()">Verify PIN</button>
             </div>
 
             <div id="ownerPanel" class="hidden">
                 <p class="text-gray-500 text-sm mb-4">Update Location Link:</p>
-                <a id="mapBtn" href="https://www.google.com/maps" target="_blank" class="btn btn-secondary mb-4 flex items-center justify-center gap-2">
-                    📍 Open Google Maps
+                <a href="https://www.google.com/maps" target="_blank" class="btn btn-secondary mb-4 flex items-center justify-center gap-2">
+                    📍 Step 1: Open Google Maps
                 </a>
-                <input type="text" id="locLink1" class="input" placeholder="Paste Map Link 1">
-                <input type="text" id="locLink2" class="input" placeholder="Paste Map Link 2">
-                <button class="btn btn-primary" onclick="saveOwnerLocation()">Save & WhatsApp Share</button>
+                <p class="text-[10px] text-gray-400 mb-2 uppercase">Step 2: Paste Links Below</p>
+                <input type="text" id="locLink1" class="input" placeholder="Paste Map Share Link 1">
+                <input type="text" id="locLink2" class="input" placeholder="Paste Map Share Link 2">
+                <button class="btn btn-primary" onclick="saveOwnerUpdate()">Step 3: Save & WA Alert</button>
             </div>
         </div>
 
-        <!-- Cat 3: P01_Pay -->
+        <!-- 3. Category 3: P01_Pay -->
         <div id="payView" class="hidden">
             <h2 class="text-xl font-bold mb-1" id="payName">Merchant</h2>
-            <p class="text-gray-500 text-xs mb-4" id="payUpi">upi@id</p>
-            <div class="bg-gray-50 p-4 rounded-xl mb-6 text-center">
-                <span class="text-gray-400 text-xs block mb-1">ENTER AMOUNT</span>
-                <input type="number" class="input text-2xl font-bold text-center mb-0" placeholder="₹ 0.00">
+            <p class="mono text-gray-400 text-xs mb-6" id="payUpi">upi@id</p>
+            <div class="bg-gray-50 p-6 rounded-2xl mb-6 text-center border border-gray-100">
+                <span class="text-gray-400 text-[10px] font-bold block mb-2 uppercase tracking-widest">Enter Amount</span>
+                <input type="number" class="input text-3xl font-bold text-center mb-0 border-none bg-transparent" placeholder="₹ 0.00">
             </div>
             <button class="btn btn-primary">Pay Fast Now</button>
         </div>
 
-        <!-- Cat 3: P03_Biz -->
+        <!-- 4. Category 3: P03_Biz -->
         <div id="bizView" class="hidden">
-            <div class="text-center mb-6">
-                <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">👤</div>
+            <div class="text-center mb-8">
+                <div class="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">👤</div>
                 <h2 class="text-2xl font-bold" id="bizName">Name</h2>
-                <p class="text-gray-500" id="bizJob">Job Title</p>
+                <p class="text-gray-500 font-medium" id="bizJob">Job Title</p>
             </div>
-            <div class="grid grid-cols-2 gap-3 mb-6" id="socialLinks">
-                <!-- Links will be added here -->
-            </div>
-            <button class="btn btn-primary" onclick="saveContact()">Save Contact</button>
+            <div class="grid grid-cols-2 gap-3 mb-6" id="socialLinks"></div>
+            <button class="btn btn-primary" onclick="saveVCard()">Save to Contacts</button>
         </div>
 
-        <!-- Cat 3: P12_Invite / P15_Static -->
-        <div id="pinProtectedView" class="hidden">
+        <!-- 5. Category 3: P12_Invite / P15_Static -->
+        <div id="pinView" class="hidden">
             <h2 class="text-xl font-bold mb-2" id="pinTitle">Secure Access</h2>
             <div id="pinEntry">
-                <p class="text-gray-500 text-sm mb-6">Enter PIN to view details.</p>
-                <input type="password" id="securePin" class="input" placeholder="Enter 4-Digit PIN">
-                <button class="btn btn-primary" onclick="verifySecurePin()">Unlock</button>
+                <p class="text-gray-500 text-sm mb-6">Enter PIN to view private details.</p>
+                <input type="password" id="securePinInput" class="input" placeholder="Enter PIN">
+                <button class="btn btn-primary" onclick="verifySecurePin()">Unlock Details</button>
             </div>
             <div id="secureDetails" class="hidden">
-                <div id="inviteDetails" class="hidden">
-                    <h3 class="text-2xl font-bold text-red-600 mb-1" id="eventTitle">Event</h3>
-                    <p class="text-gray-600 mb-1" id="hostName">Host: </p>
-                    <p class="font-bold text-gray-800 mb-6" id="eventDate">Date: </p>
+                <div id="inviteBox" class="hidden">
+                    <h3 class="text-2xl font-bold text-red-600 mb-1" id="evTitle">Event</h3>
+                    <p class="text-gray-600 mb-1" id="evHost">Host: </p>
+                    <p class="font-bold text-gray-800 mb-6" id="evDate">Date: </p>
                 </div>
-                <div id="staticDetails" class="hidden">
-                    <h3 class="text-2xl font-bold text-blue-600 mb-1" id="locName">Location</h3>
-                    <p class="text-gray-600 mb-6" id="locAddress">Address: </p>
+                <div id="staticBox" class="hidden">
+                    <h3 class="text-2xl font-bold text-blue-600 mb-1" id="stName">Location</h3>
+                    <p class="text-gray-600 mb-6" id="stAddr">Address: </p>
                 </div>
-                <a id="secureMap" href="#" target="_blank" class="btn btn-secondary mb-3">📍 View on Maps</a>
-                <a id="secureVideo" href="#" target="_blank" class="btn btn-secondary">🎥 Watch Video</a>
+                <a id="scMap" href="#" target="_blank" class="btn btn-secondary mb-3">📍 View Location</a>
+                <a id="scVid" href="#" target="_blank" class="btn btn-secondary">🎥 Watch Video</a>
             </div>
         </div>
 
-        <!-- Cat 4: P13_Doc -->
+        <!-- 6. Category 4: P13_Doc -->
         <div id="docView" class="hidden text-center">
-            <h2 class="text-xl font-bold mb-2">Doc Vault Security</h2>
-            <p class="text-gray-500 text-xs mb-6">Document access valid for 20 minutes only.</p>
+            <h2 class="text-xl font-bold mb-2">Secure Doc Vault</h2>
+            <p class="text-gray-500 text-xs mb-8">Access valid for 20 minutes session.</p>
             
-            <div id="docTimerArea" class="hidden">
-                <div class="timer mb-6" id="timeLeft">20:00</div>
-                <div id="docPasswordArea" class="hidden">
-                    <p class="text-xs text-gray-400 mb-2">ENTER PASSWORD PROVIDED BY OWNER</p>
-                    <input type="password" id="docInputPass" class="input" placeholder="Enter Password">
-                    <button class="btn btn-primary" onclick="openDoc()">Open Document PDF</button>
+            <div id="docTimerBox" class="hidden">
+                <div class="timer mb-8" id="docTimeLeft">20:00</div>
+                <div id="docRequestBox">
+                    <button class="btn btn-primary mb-4" onclick="reqDocWA()">REQUEST DRIVE ACCESS</button>
+                    <p class="text-[10px] text-gray-400">Owner will share the PDF password on WhatsApp.</p>
                 </div>
-                <div id="docRequestArea">
-                    <button class="btn btn-primary" onclick="requestDocAccess()">REQUEST DRIVE ACCESS</button>
-                    <p class="text-[10px] text-gray-400 mt-4">Note: Owner will share the password after verification.</p>
+                <div id="docPassBox" class="hidden">
+                    <p class="text-[10px] text-gray-400 mb-2 uppercase font-bold">Enter Password from Owner</p>
+                    <input type="password" id="docPassInput" class="input" placeholder="Enter Password">
+                    <button class="btn btn-primary" onclick="openDocPDF()">Open Document</button>
                 </div>
             </div>
 
-            <div id="docStart">
-                <button class="btn btn-primary" onclick="startDocTimer()">START 20 MIN SESSION</button>
+            <div id="docStartBox">
+                <button class="btn btn-primary" onclick="startDocSession()">START 20 MIN SESSION</button>
             </div>
         </div>
 
@@ -152,6 +154,8 @@
 
 <script>
     const SHEETDB_URL = "https://sheetdb.io/api/v1/vpozwh7cptzc4";
+    const COMPANY_WA = "919718531983";
+    
     let currentData = null;
     let serviceType = null;
     let customerId = null;
@@ -159,44 +163,29 @@
     async function init() {
         const params = new URLSearchParams(window.location.search);
         const s = params.get('s');
-        const t = params.get('t'); // Support for direct 't' and 'id' params from notepad
-        const id = params.get('id');
+        if(!s) return alert("Invalid QR!");
 
         try {
-            if(s) {
-                // Support both standard base64 and URL-safe base64
-                let base64 = s.replace(/-/g, '+').replace(/_/g, '/');
-                while (base64.length % 4) base64 += '=';
-                const payload = JSON.parse(atob(base64));
-                serviceType = payload.t || payload.type || payload.T;
-                customerId = payload.c || payload.n || payload.id || payload.q || payload.C;
-            } else if(t && id) {
-                serviceType = t;
-                customerId = id;
-            } else {
-                throw new Error("Invalid QR Link!");
-            }
+            // Support URL-safe base64 from Dashboard
+            let b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            const payload = JSON.parse(atob(b64));
             
-            // Map Cust_ID header based on service
-            let idHeader = "Cust_ID";
-            if(["P00_Human", "P00_Value", "P15_Static"].includes(serviceType)) {
-                idHeader = "Cust_ID(No.)";
-            }
+            serviceType = payload.t;
+            customerId = payload.c;
 
-            // Fetch data from SheetDB
-            const response = await fetch(`${SHEETDB_URL}/search?${idHeader}=${customerId}&sheet=${serviceType}`);
-            const data = await response.json();
-            
-            if(!Array.isArray(data) || data.length === 0) {
-                console.error("SheetDB Error or No Data:", data);
-                throw new Error("Tag data not found or API error!");
-            }
+            // Search in SheetDB
+            let idHeader = (serviceType.includes('P00') || serviceType === 'P15') ? "Cust_ID(No.)" : "Cust_ID";
+            const res = await fetch(`${SHEETDB_URL}/search?${idHeader}=${customerId}&sheet=${serviceType}`);
+            const data = await res.json();
+
+            if(!Array.isArray(data) || data.length === 0) throw new Error("Tag not found!");
             currentData = data[0];
 
             renderUI();
         } catch (err) {
             console.error(err);
-            document.getElementById('loader').innerHTML = `<p class="text-red-500">Error: ${err.message}</p>`;
+            document.getElementById('loader').innerHTML = `<p class="text-red-500 font-bold">ERROR: ${err.message}</p>`;
         }
     }
 
@@ -219,18 +208,18 @@
             document.getElementById('bizJob').innerText = currentData.Job;
             const socials = document.getElementById('socialLinks');
             const links = [
-                { id: 'Phone', icon: '📞', label: 'Call' },
-                { id: 'Email', icon: '✉️', label: 'Email' },
-                { id: 'Instagram', icon: '📸', label: 'Instagram' },
-                { id: 'LinkedIn', icon: '💼', label: 'LinkedIn' },
-                { id: 'Website', icon: '🌐', label: 'Website' }
+                { k: 'Phone', i: '📞', l: 'Call' },
+                { k: 'Email', i: '✉️', l: 'Email' },
+                { k: 'Instagram', i: '📸', l: 'Instagram' },
+                { k: 'LinkedIn', i: '💼', l: 'LinkedIn' },
+                { k: 'Website', i: '🌐', l: 'Website' }
             ];
-            links.forEach(l => {
-                if(currentData[l.id]) {
+            links.forEach(x => {
+                if(currentData[x.k]) {
                     const a = document.createElement('a');
-                    a.href = l.id === 'Phone' ? `tel:${currentData[l.id]}` : (l.id === 'Email' ? `mailto:${currentData[l.id]}` : currentData[l.id]);
-                    a.className = "p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-sm font-bold border border-gray-100 hover:bg-gray-100";
-                    a.innerHTML = `<span>${l.icon}</span> ${l.label}`;
+                    a.href = x.k === 'Phone' ? `tel:${currentData[x.k]}` : (x.k === 'Email' ? `mailto:${currentData[x.k]}` : currentData[x.k]);
+                    a.className = "p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-xs font-bold border border-gray-100";
+                    a.innerHTML = `<span>${x.i}</span> ${x.l}`;
                     socials.appendChild(a);
                 }
             });
@@ -241,85 +230,64 @@
         } else if(serviceType === "P11_Challan") {
             window.location.href = `https://echallan.parivahan.gov.in/index/accused-challan?vehicleNumber=${currentData.Vehicle_No || ''}`;
         } else if(serviceType === "P12_Invite" || serviceType === "P15_Static") {
-            document.getElementById('pinProtectedView').classList.remove('hidden');
+            document.getElementById('pinView').classList.remove('hidden');
             document.getElementById('pinTitle').innerText = serviceType === "P12_Invite" ? "Event Invitation" : "Location Details";
         } else if(serviceType === "P13_Doc") {
             document.getElementById('docView').classList.remove('hidden');
         }
     }
 
-    // --- Tab Switching ---
-    function switchTab(view) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        if(view === 'savior') {
-            document.querySelectorAll('.tab')[0].classList.add('active');
-            document.getElementById('saviorView').classList.remove('hidden');
-            document.getElementById('ownerView').classList.add('hidden');
-        } else {
-            document.querySelectorAll('.tab')[1].classList.add('active');
-            document.getElementById('ownerView').classList.remove('hidden');
-            document.getElementById('saviorView').classList.add('hidden');
-        }
+    function switchTab(t) {
+        document.getElementById('tabSavior').className = "tab " + (t === 'savior' ? 'active' : '');
+        document.getElementById('tabOwner').className = "tab " + (t === 'owner' ? 'active' : '');
+        document.getElementById('saviorView').className = t === 'savior' ? '' : 'hidden';
+        document.getElementById('ownerView').className = t === 'owner' ? '' : 'hidden';
     }
 
-    // --- Savior Logic ---
-    function showSaviorForm() {
-        // First open WhatsApp to verify/notify
-        const companyWA = currentData.WACompany || "919718531983";
-        const msg = `Verify Alert for ${customerId}`;
-        window.open(`https://wa.me/${companyWA}?text=${encodeURIComponent(msg)}`, '_blank');
-        
-        // Then show the form
+    // --- SAVIOR WORKFLOW ---
+    function startSaviorForm() {
+        window.open(`https://wa.me/${COMPANY_WA}?text=${encodeURIComponent('Verify Alert for ' + customerId)}`, '_blank');
         document.getElementById('waStep').classList.add('hidden');
         document.getElementById('saviorForm').classList.remove('hidden');
     }
 
     async function submitSaviorAlert() {
-        const phone = document.getElementById('saviorPhone').value;
-        const dikkat = document.getElementById('saviorDikkat').value;
-        if(!phone || !dikkat) return alert("Kripya dono jankari bharein!");
+        const phone = document.getElementById('savPhone').value;
+        const reason = document.getElementById('savReason').value;
+        if(!phone || !reason) return alert("Pehle phone aur dikkat bharein!");
 
         const btn = event.target;
         btn.disabled = true;
-        btn.innerText = "Processing...";
+        btn.innerText = "Saving Alert...";
 
         try {
-            // Record alert to Sheet
-            await fetch(`${SHEETDB_URL}?sheet=All_Alerts`, {
+            // Save to Scanner_Logs (GID 1400591856 in sheet)
+            await fetch(`${SHEETDB_URL}?sheet=Scanner_Logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     Timestamp: new Date().toLocaleString(),
-                    Cust_ID: customerId,
-                    ScannerNo: phone,
-                    Dikkat: dikkat,
-                    Type: serviceType
+                    Vehicle: customerId,
+                    "Scanner Phone": phone,
+                    Reason: reason
                 })
             });
 
-            // Prepare Email - EXACT TEXT FROM NOTEPAD
-            const subject = encodeURIComponent("🚨 Gadi Alert: " + customerId);
-            const body = encodeURIComponent(
-                "Namaste,\n\nAapki gadi (" + customerId + ") ke saath ye dikkat hai:\n" + 
-                "👉 " + dikkat + "\n\n" +
-                "Main gadi ke paas khada hoon. Aap mujhe is number par contact kar sakte hain: " + phone + "\n\n" +
-                "- Sent via 10haath Smart QR System"
-            );
-            
-            const recipients = (currentData.Email1 || "") + (currentData.Email2 ? "," + currentData.Email2 : "");
-            window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
-            
-            btn.innerText = "Email App Opened!";
-        } catch (err) {
-            alert("Error sending alert: " + err.message);
+            // Email Prefilled
+            const sub = `🚨 Security Alert: ${customerId}`;
+            const body = `Namaste,\n\nAapki gadi (${customerId}) ke saath ye dikkat hai:\n👉 ${reason}\n\nMain gadi ke paas hoon. Contact: ${phone}\n\n- Sent via 10haath`;
+            const mails = (currentData.Email1 || "") + (currentData.Email2 ? "," + currentData.Email2 : "");
+            window.location.href = `mailto:${mails}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+            btn.innerText = "Email Opened!";
+        } catch (e) {
+            alert("Error: " + e.message);
             btn.disabled = false;
-            btn.innerText = "Submit & Send Email";
         }
     }
 
-    // --- Owner Logic ---
+    // --- OWNER WORKFLOW ---
     function verifyOwnerPin() {
-        const pin = document.getElementById('ownerPin').value;
+        const pin = document.getElementById('ownerPinInput').value;
         if(pin === currentData.Owner_PIN) {
             document.getElementById('ownerLogin').classList.add('hidden');
             document.getElementById('ownerPanel').classList.remove('hidden');
@@ -328,113 +296,82 @@
         }
     }
 
-    async function saveOwnerLocation() {
-        const link1 = document.getElementById('locLink1').value;
-        const link2 = document.getElementById('locLink2').value;
-        if(!link1) return alert("Kripya location link dalein!");
+    async function saveOwnerUpdate() {
+        const l1 = document.getElementById('locLink1').value;
+        const l2 = document.getElementById('locLink2').value;
+        if(!l1) return alert("Map link paste karein!");
 
         const btn = event.target;
-        const originalText = btn.innerText;
         btn.disabled = true;
-        btn.innerText = "Saving...";
 
         try {
-            let idHeader = "Cust_ID";
-            if(["P00_Human", "P00_Value", "P15_Static"].includes(serviceType)) {
-                idHeader = "Cust_ID(No.)";
-            }
-
-            // Update Sheet
-            const response = await fetch(`${SHEETDB_URL}/${idHeader}/${customerId}?sheet=${serviceType}`, {
+            let idHeader = (serviceType.includes('P00') || serviceType === 'P15') ? "Cust_ID(No.)" : "Cust_ID";
+            await fetch(`${SHEETDB_URL}/${idHeader}/${customerId}?sheet=${serviceType}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: { Maps_Link: link1, Extra_Link: link2 }})
+                body: JSON.stringify({ data: { "Liv location": l1, "Dikkat": l2 } })
             });
 
-            if(!response.ok) throw new Error("Update failed");
-
-            // WhatsApp Redirect - EXACT PREFILLED HELP MESSAGE
-            const msg = `Help Needed! 🚨\n\nOwner: ${currentData.Person_Name}\nVehicle: ${customerId}\n\nMy Location (Share Link): ${link1}\nSecondary Location: ${link2 || 'N/A'}\n\nPlease help me immediately.`;
-            const targetPhone = currentData.Emergency1 || currentData.WACompany;
-            window.location.href = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
-        } catch (err) {
-            alert("Error saving: " + err.message);
+            const msg = `Help Needed! 🚨\nOwner: ${currentData.Person_Name}\nID: ${customerId}\nLocation: ${l1}\nSecondary: ${l2 || 'N/A'}`;
+            window.location.href = `https://wa.me/${currentData.Emergency1 || COMPANY_WA}?text=${encodeURIComponent(msg)}`;
+        } catch (e) {
+            alert("Error: " + e.message);
             btn.disabled = false;
-            btn.innerText = originalText;
         }
     }
 
-    // --- Secure Pin (Invite/Static) ---
+    // --- OTHER LOGIC ---
     function verifySecurePin() {
-        const pin = document.getElementById('securePin').value;
-        if(pin === currentData.PIN) {
+        const p = document.getElementById('securePinInput').value;
+        if(p === currentData.PIN) {
             document.getElementById('pinEntry').classList.add('hidden');
             document.getElementById('secureDetails').classList.remove('hidden');
             if(serviceType === "P12_Invite") {
-                document.getElementById('inviteDetails').classList.remove('hidden');
-                document.getElementById('eventTitle').innerText = currentData.Event_Name;
-                document.getElementById('hostName').innerText = "Host: " + currentData.Host_Name;
-                document.getElementById('eventDate').innerText = "Date: " + currentData.Date;
+                document.getElementById('inviteBox').classList.remove('hidden');
+                document.getElementById('evTitle').innerText = currentData.Event_Name;
+                document.getElementById('evHost').innerText = "Host: " + currentData.Host_Name;
+                document.getElementById('evDate').innerText = "Date: " + currentData.Date;
             } else {
-                document.getElementById('staticDetails').classList.remove('hidden');
-                document.getElementById('locName').innerText = currentData['Name of location'] || currentData.Location_Name;
-                document.getElementById('locAddress').innerText = "Address: " + (currentData['Written Address'] || currentData.Address);
+                document.getElementById('staticBox').classList.remove('hidden');
+                document.getElementById('stName').innerText = currentData['Name of location'];
+                document.getElementById('stAddr').innerText = currentData['Written Address'];
             }
-            document.getElementById('secureMap').href = currentData.Maps_Link;
-            if(currentData.Video_Link) {
-                document.getElementById('secureVideo').href = currentData.Video_Link;
-                document.getElementById('secureVideo').classList.remove('hidden');
-            } else {
-                document.getElementById('secureVideo').classList.add('hidden');
-            }
-        } else {
-            alert("Incorrect PIN!");
-        }
+            document.getElementById('scMap').href = currentData.Maps_Link;
+            if(currentData.Video_Link) document.getElementById('scVid').href = currentData.Video_Link;
+            else document.getElementById('scVid').classList.add('hidden');
+        } else alert("Wrong PIN!");
     }
 
-    // --- Doc Vault Logic ---
-    let docTimer = null;
-    function startDocTimer() {
-        document.getElementById('docStart').classList.add('hidden');
-        document.getElementById('docTimerArea').classList.remove('hidden');
+    function startDocSession() {
+        document.getElementById('docStartBox').classList.add('hidden');
+        document.getElementById('docTimerBox').classList.remove('hidden');
         let sec = 1200;
-        docTimer = setInterval(() => {
+        setInterval(() => {
             sec--;
-            let mins = Math.floor(sec / 60);
-            let rs = sec % 60;
-            document.getElementById('timeLeft').innerText = `${mins}:${rs < 10 ? '0' : ''}${rs}`;
-            if(sec <= 0) {
-                clearInterval(docTimer);
-                document.body.innerHTML = "<div class='card p-10 text-center text-red-500 font-bold'>Session Expired!</div>";
-            }
+            let m = Math.floor(sec/60), s = sec%60;
+            document.getElementById('docTimeLeft').innerText = `${m}:${s<10?'0':''}${s}`;
+            if(sec<=0) location.reload();
         }, 1000);
     }
 
-    async function requestDocAccess() {
-        const ownerPhone = currentData.Emergency1 || currentData.WACompany || "919718531983";
-        const msg = `🚨 Doc Vault Access Request!\nOwner Name: ${currentData.Name}\nVehicle: ${currentData.Gadi_Number || customerId}\nPlease share the PDF password with the requester.`;
-        window.open(`https://wa.me/${ownerPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        
-        alert("Access Request Sent to Owner via WhatsApp! Please wait for the password.");
-        document.getElementById('docRequestArea').classList.add('hidden');
-        document.getElementById('docPasswordArea').classList.remove('hidden');
+    function reqDocWA() {
+        const msg = `🚨 Doc Access Request!\nID: ${customerId}\nOwner: ${currentData.Name}\nVehicle: ${currentData.Gadi_Number}\nShare password please.`;
+        window.open(`https://wa.me/${currentData.Emergency1 || COMPANY_WA}?text=${encodeURIComponent(msg)}`, '_blank');
+        document.getElementById('docRequestBox').classList.add('hidden');
+        document.getElementById('docPassBox').classList.remove('hidden');
     }
 
-    function openDoc() {
-        const pass = document.getElementById('docInputPass').value;
-        if(pass === currentData.Drive_Password) {
+    function openDocPDF() {
+        if(document.getElementById('docPassInput').value === currentData.Drive_Password) {
             window.location.href = currentData.Drive_Link;
-        } else {
-            alert("Incorrect Password!");
-        }
+        } else alert("Wrong Password!");
     }
 
-    function saveContact() {
-        const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${currentData.Name}\nTEL:${currentData.Phone}\nEMAIL:${currentData.Email || ''}\nEND:VCARD`;
-        const blob = new Blob([vcard], { type: 'text/vcard' });
-        const url = URL.createObjectURL(blob);
+    function saveVCard() {
+        const v = `BEGIN:VCARD\nVERSION:3.0\nFN:${currentData.Name}\nTEL:${currentData.Phone}\nEMAIL:${currentData.Email || ''}\nEND:VCARD`;
+        const b = new Blob([v], { type: 'text/vcard' });
         const a = document.createElement('a');
-        a.href = url;
+        a.href = URL.createObjectURL(b);
         a.download = `${currentData.Name}.vcf`;
         a.click();
     }
