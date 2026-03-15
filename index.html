@@ -794,11 +794,11 @@ const SERVICES = {
     fields: [
       { header: 'Timestamp',        type: '!', short: null },
       { header: 'Cust_ID',          type: '$', short: 'c',   label: 'Customer ID',    ph: 'e.g. 4000',    input: 'number', sheetHeader: 'Cust_ID(No.)' },
-      { header: 'Name',             type: '#', short: 'n',   label: 'Name',           ph: 'Owner name',    input: 'text'   },
-      { header: 'Gadi_Number',      type: '#', short: 'v',   label: 'Gadi Number',    ph: 'UK07-AB-1234',  input: 'text'   },
-      { header: 'Drive_Link',       type: '#', short: 'dl',  label: 'Drive Link',     ph: 'Paste Drive Link', input: 'url' },
-      { header: 'Drive_Password',   type: '#', short: 'dp',  label: 'Drive Password', ph: 'Password (if any)', input: 'text', required: false },
-      { header: 'Free_PDF_Link',    type: '#', short: 'fp',  label: 'Free PDF Link',  ph: 'Direct PDF Link',  input: 'url', required: false },
+      { header: 'Name',             type: '#', short: 'n',   label: 'Name',           ph: 'Owner name',    input: 'text', sheetHeader: 'Person_Name' },
+      { header: 'Gadi_Number',      type: '#', short: 'v',   label: 'Gadi Number',    ph: 'UK07-AB-1234',  input: 'text', sheetHeader: 'Gadi_Number' },
+      { header: 'Drive_Link',       type: '#', short: 'dl',  label: 'Drive Link',     ph: 'Paste Drive Link', input: 'url', sheetHeader: 'Drive_Link' },
+      { header: 'Drive_Password',   type: '#', short: 'dp',  label: 'Drive Password', ph: 'Password (if any)', input: 'text', required: false, sheetHeader: 'Drive_Password' },
+      { header: 'Free_PDF_Link',    type: '#', short: 'fp',  label: 'Free PDF Link',  ph: 'Direct PDF Link',  input: 'url', required: false, sheetHeader: 'Password_Free_PDF_Link' },
     ]
   },
   P15_Static: {
@@ -1010,9 +1010,9 @@ async function handleSubmit() {
   const custId   = values['Cust_ID'];
   let qrURL = null;
 
-  // Build short-key secret for QR (only # fields, excluding Cust_ID which is $)
+  // Build short-key secret for QR
   const secret = {};
-  svc.fields.filter(f => f.type === '#').forEach(f => {
+  svc.fields.filter(f => f.type === '#' || f.header === 'Cust_ID').forEach(f => {
     secret[f.short] = values[f.header];
   });
   const sEncoded = btoa(JSON.stringify(secret));

@@ -1043,7 +1043,8 @@ function switchToSavior() {
   const t = getParams().t;
   const s = t === 'P00_Human' ? _humanSecret : _valueSecret;
   const gadi = s.n || getParams().n || 'Unknown';
-  document.getElementById('wa_verify_btn').href = `https://wa.me/${COMPANY_WA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
+  const targetWA = s.wa || COMPANY_WA;
+  document.getElementById('wa_verify_btn').href = `https://wa.me/${targetWA}?text=Verify%20Alert%20for%20${encodeURIComponent(gadi)}`;
   showPage('page_Savior_Step1');
 }
 
@@ -1091,12 +1092,9 @@ async function confirmAndSaveOwnerSOS() {
     return;
   }
 
-  const btn = document.getElementById('od_updateBtn'); // Note: button ID might be different in new layout
-  // Let's just use the event target or find it
-  
   // 1. Save to Live_Status sheet
   try {
-    await fetch(SHEETDB_BASE + '?sheet=Live_Status', {
+    const res = await fetch(SHEETDB_BASE + '?sheet=Live_Status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: [{
@@ -1107,7 +1105,12 @@ async function confirmAndSaveOwnerSOS() {
         Service: t
       }]})
     });
-  } catch(e) { console.error('Status update failed', e); }
+    if (!res.ok) throw new Error('Sheet save failed');
+    alert("Live location saved successfully!");
+  } catch(e) { 
+    console.error('Status update failed', e); 
+    alert("Sheet save failed. Check console.");
+  }
 
   // 2. Redirect to WA Emergency
   const msg = encodeURIComponent(`HELP! I am at this location: ${link}\n- Sent via 10haath Owner SOS`);
